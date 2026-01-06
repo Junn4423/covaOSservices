@@ -180,24 +180,27 @@ model RefreshToken {
 }
 
 model KhachHang {
-  id              String    @id @default(uuid()) @db.Char(36)
-  id_doanh_nghiep String    @db.Char(36)
-  ma_khach_hang   String?   @db.VarChar(50)
-  ten_khach_hang  String    @db.VarChar(255)
-  email           String?   @db.VarChar(255)
-  so_dien_thoai   String?   @db.VarChar(20)
-  dia_chi         String?   @db.Text
-  thanh_pho       String?   @db.VarChar(100)
-  quan_huyen      String?   @db.VarChar(100)
-  toa_do_lat      Decimal?  @db.Decimal(10, 8)
-  toa_do_lng      Decimal?  @db.Decimal(11, 8)
-  loai_khach      LoaiKhach @default(ca_nhan)
-  ghi_chu         String?   @db.Text
-  ngay_tao        DateTime  @default(now())
-  ngay_cap_nhat   DateTime  @updatedAt
-  ngay_xoa        DateTime?
-  nguoi_tao_id    String?   @db.Char(36)
-  nguoi_cap_nhat_id String? @db.Char(36)
+  id                String      @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep   String      @db.Char(36)
+  ma_khach_hang     String?     @db.VarChar(50)
+  ho_ten            String      @db.VarChar(255)          // Đổi từ ten_khach_hang thành ho_ten
+  so_dien_thoai     String?     @db.VarChar(20)
+  email             String?     @db.VarChar(255)
+  dia_chi           String?     @db.Text
+  thanh_pho         String?     @db.VarChar(100)
+  quan_huyen        String?     @db.VarChar(100)
+  toa_do_lat        Decimal?    @db.Decimal(10, 8)
+  toa_do_lng        Decimal?    @db.Decimal(11, 8)
+  loai_khach        LoaiKhach   @default(ca_nhan)
+  nguon_khach       NguonKhach  @default(KHAC)            // Nguồn khách hàng: FACEBOOK, WEBSITE, REFERRAL, KHAC
+  ghi_chu           String?     @db.Text
+
+  // Standard audit fields
+  ngay_tao          DateTime    @default(now())
+  nguoi_tao_id      String?     @db.Char(36)
+  ngay_cap_nhat     DateTime    @updatedAt
+  nguoi_cap_nhat_id String?     @db.Char(36)
+  ngay_xoa          DateTime?                             // Soft delete
 
   // Relations
   doanh_nghiep      DoanhNghiep       @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
@@ -208,8 +211,10 @@ model KhachHang {
   tai_khoan_khach   TaiKhoanKhach[]
   danh_gia          DanhGia[]
 
-  @@index([ten_khach_hang])
-  @@index([so_dien_thoai])
+  @@unique([ma_khach_hang, id_doanh_nghiep])              // Mã KH unique trong 1 doanh nghiệp
+  @@index([id_doanh_nghiep])                              // Index cho tenant filter
+  @@index([ho_ten])                                       // Index cho tìm kiếm theo tên
+  @@index([so_dien_thoai])                                // Index cho tìm kiếm theo SĐT
   @@map("khach_hang")
 }
 
@@ -930,6 +935,14 @@ enum VaiTro {
 enum LoaiKhach {
   ca_nhan
   doanh_nghiep
+}
+
+// Nguồn khách hàng - dùng cho TechMate CRM
+enum NguonKhach {
+  FACEBOOK
+  WEBSITE
+  REFERRAL
+  KHAC
 }
 
 enum LoaiAnh {

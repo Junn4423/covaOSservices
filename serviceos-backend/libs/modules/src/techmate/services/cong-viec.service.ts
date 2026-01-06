@@ -23,7 +23,7 @@ export class CongViecService {
                 take: limit,
                 orderBy: { ngay_tao: 'desc' },
                 include: {
-                    khach_hang: { select: { id: true, ten_khach_hang: true, so_dien_thoai: true } },
+                    khach_hang: { select: { id: true, ho_ten: true, so_dien_thoai: true } },
                     phan_cong: { include: { nguoi_dung: { select: { id: true, ho_ten: true } } } },
                 },
             }),
