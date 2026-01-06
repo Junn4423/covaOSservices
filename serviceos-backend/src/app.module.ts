@@ -26,8 +26,8 @@ import { CommonModule, JwtAuthGuard, JwtStrategy } from '@libs/common';
 import {
     CoreModule,
     TechMateModule,
+    StockPileModule,
     // Uncomment khi implement các module khác:
-    // StockPileModule,
     // ShiftSquadModule,
     // AssetTrackModule,
     // RouteOptimaModule,
@@ -69,6 +69,7 @@ import { AppService } from './app.service';
         // Business Modules
         CoreModule,
         TechMateModule,
+        StockPileModule,
     ],
     controllers: [AppController],
     providers: [

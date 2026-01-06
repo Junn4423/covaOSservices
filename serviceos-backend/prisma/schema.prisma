@@ -64,6 +64,7 @@ model DoanhNghiep {
   thanh_toan_saas     ThanhToanSaas[]
   nhat_ky_hoat_dong   NhatKyHoatDong[]  // Audit logs
   refresh_tokens      RefreshToken[]    // JWT refresh tokens
+  nhom_san_pham       NhomSanPham[]     // Product categories
 
   @@map("doanh_nghiep")
 }
@@ -391,33 +392,78 @@ model Kho {
   @@map("kho")
 }
 
-model SanPham {
-  id              String    @id @default(uuid()) @db.Char(36)
-  id_doanh_nghiep String    @db.Char(36)
-  ma_sku          String?   @db.VarChar(100)
-  ten_san_pham    String    @db.VarChar(255)
-  mo_ta           String?   @db.Text
-  don_vi_tinh     String    @default("Cái") @db.VarChar(50)
-  gia_nhap        Decimal   @default(0) @db.Decimal(19, 4)
-  gia_ban         Decimal   @default(0) @db.Decimal(19, 4)
-  anh_san_pham    String?   @db.VarChar(500)
-  danh_muc        String?   @db.VarChar(100)
-  trang_thai      Int       @default(1) @db.TinyInt
-  ngay_tao        DateTime  @default(now())
-  ngay_cap_nhat   DateTime  @updatedAt
-  ngay_xoa        DateTime?
-  nguoi_tao_id    String?   @db.Char(36)
-  nguoi_cap_nhat_id String? @db.Char(36)
+// ============================================================
+// NHÓM SẢN PHẨM (Product Category)
+// ============================================================
+model NhomSanPham {
+  id                String    @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep   String    @db.Char(36)
+  ten_nhom          String    @db.VarChar(255)
+  mo_ta             String?   @db.Text
+  thu_tu            Int       @default(0)               // Thứ tự hiển thị
+  trang_thai        Int       @default(1) @db.TinyInt
+
+  // Audit fields
+  ngay_tao          DateTime  @default(now())
+  nguoi_tao_id      String?   @db.Char(36)
+  ngay_cap_nhat     DateTime  @updatedAt
+  nguoi_cap_nhat_id String?   @db.Char(36)
+  ngay_xoa          DateTime?                           // Soft delete
 
   // Relations
-  doanh_nghiep        DoanhNghiep         @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
-  ton_kho             TonKho[]
-  lich_su_kho         LichSuKho[]
-  chi_tiet_bao_gia    ChiTietBaoGia[]
+  doanh_nghiep      DoanhNghiep @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
+  san_pham          SanPham[]                           // 1 Nhóm có nhiều Sản phẩm
+
+  @@index([id_doanh_nghiep])
+  @@index([ten_nhom])
+  @@map("nhom_san_pham")
+}
+
+// ============================================================
+// SẢN PHẨM (Product)
+// ============================================================
+model SanPham {
+  id                  String      @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep     String      @db.Char(36)
+  id_nhom_san_pham    String?     @db.Char(36)          // FK nullable - Nhóm sản phẩm
+
+  // Thông tin cơ bản
+  ma_san_pham         String?     @db.VarChar(100)      // Mã SP (auto-generate nếu thiếu)
+  ten_san_pham        String      @db.VarChar(255)
+  loai_san_pham       LoaiSanPham @default(HANG_HOA)    // HANG_HOA, DICH_VU, COMBO
+  mo_ta               String?     @db.Text
+
+  // Giá & Đơn vị
+  gia_ban             Decimal     @default(0) @db.Decimal(15, 2)  // Giá bán
+  gia_von             Decimal     @default(0) @db.Decimal(15, 2)  // Giá vốn (cost)
+  don_vi_tinh         String?     @db.VarChar(50)       // Cái, Chiếc, Hộp...
+
+  // Media
+  hinh_anh            String?     @db.VarChar(500)      // URL ảnh sản phẩm
+
+  // Trạng thái
+  trang_thai          Int         @default(1) @db.TinyInt
+
+  // Audit fields
+  ngay_tao            DateTime    @default(now())
+  nguoi_tao_id        String?     @db.Char(36)
+  ngay_cap_nhat       DateTime    @updatedAt
+  nguoi_cap_nhat_id   String?     @db.Char(36)
+  ngay_xoa            DateTime?                         // Soft delete
+
+  // Relations
+  doanh_nghiep          DoanhNghiep     @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
+  nhom_san_pham         NhomSanPham?    @relation(fields: [id_nhom_san_pham], references: [id], onDelete: SetNull)
+  ton_kho               TonKho[]
+  lich_su_kho           LichSuKho[]
+  chi_tiet_bao_gia      ChiTietBaoGia[]
   chi_tiet_don_dat_hang ChiTietDonDatHang[]
 
-  @@unique([id_doanh_nghiep, ma_sku])
+  @@unique([ma_san_pham, id_doanh_nghiep])              // Mã SP unique per tenant
+  @@index([id_doanh_nghiep])
+  @@index([id_nhom_san_pham])
   @@index([ten_san_pham])
+  @@index([loai_san_pham])
   @@map("san_pham")
 }
 
@@ -949,6 +995,13 @@ enum LoaiAnh {
   truoc
   sau
   qua_trinh
+}
+
+// Loại sản phẩm - dùng cho StockPile
+enum LoaiSanPham {
+  HANG_HOA    // Hàng hóa vật lý
+  DICH_VU     // Dịch vụ
+  COMBO       // Gói combo
 }
 
 enum LoaiKho {
