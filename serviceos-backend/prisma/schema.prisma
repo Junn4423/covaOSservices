@@ -62,6 +62,8 @@ model DoanhNghiep {
   chi_tiet_don_dat_hang ChiTietDonDatHang[]
   thong_bao           ThongBao[]
   thanh_toan_saas     ThanhToanSaas[]
+  nhat_ky_hoat_dong   NhatKyHoatDong[]  // Audit logs
+  refresh_tokens      RefreshToken[]    // JWT refresh tokens
 
   @@map("doanh_nghiep")
 }
@@ -93,10 +95,88 @@ model NguoiDung {
   lo_trinh            LoTrinh[]
   phieu_thu_chi       PhieuThuChi[]
   thong_bao           ThongBao[]
+  nhat_ky_hoat_dong   NhatKyHoatDong[]  // Audit logs
+  refresh_tokens      RefreshToken[]    // JWT refresh tokens
 
   @@unique([id_doanh_nghiep, email])
   @@index([vai_tro])
   @@map("nguoi_dung")
+}
+
+// ============================================================
+// AUDIT LOG - Nhật ký hoạt động hệ thống
+// ============================================================
+// Ghi lại mọi thay đổi trong hệ thống để:
+// 1. Audit & Compliance
+// 2. Debug & Troubleshooting
+// 3. Analytics & Reporting
+
+model NhatKyHoatDong {
+  id                  String    @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep     String    @db.Char(36)
+  nguoi_thuc_hien_id  String?   @db.Char(36)
+
+  // Thông tin hành động
+  hanh_dong           HanhDong              // Enum: CREATE, UPDATE, DELETE, LOGIN, etc.
+  doi_tuong           String    @db.VarChar(50)  // Model/Entity name: NguoiDung, CongViec, etc.
+  id_doi_tuong        String?   @db.Char(36)     // ID của record bị ảnh hưởng
+  mo_ta               String?   @db.VarChar(500) // Mô tả ngắn gọn
+
+  // Dữ liệu thay đổi (JSON)
+  du_lieu_cu          Json?     // Snapshot trước khi thay đổi
+  du_lieu_moi         Json?     // Snapshot sau khi thay đổi
+
+  // Thông tin request
+  ip_address          String?   @db.VarChar(45)  // IPv4 hoặc IPv6
+  user_agent          String?   @db.VarChar(500)
+  endpoint            String?   @db.VarChar(255) // API endpoint
+
+  ngay_tao            DateTime  @default(now())
+
+  // Relations
+  doanh_nghiep        DoanhNghiep @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
+  nguoi_thuc_hien     NguoiDung?  @relation(fields: [nguoi_thuc_hien_id], references: [id], onDelete: SetNull)
+
+  @@index([id_doanh_nghiep])
+  @@index([nguoi_thuc_hien_id])
+  @@index([hanh_dong])
+  @@index([doi_tuong])
+  @@index([ngay_tao])
+  @@map("nhat_ky_hoat_dong")
+}
+
+// ============================================================
+// REFRESH TOKEN - JWT Refresh Token Management
+// ============================================================
+// Lưu trữ refresh tokens để:
+// 1. Cho phép user refresh access token mà không cần login lại
+// 2. Revoke tokens khi cần (logout, change password, etc.)
+// 3. Track các phiên đăng nhập
+
+model RefreshToken {
+  id                  String    @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep     String    @db.Char(36)
+  nguoi_dung_id       String    @db.Char(36)
+
+  token               String    @unique @db.VarChar(500) // Hashed token
+  ngay_het_han        DateTime
+  da_revoke           Boolean   @default(false)
+
+  // Device info (optional, for session management)
+  device_info         String?   @db.VarChar(255)
+  ip_address          String?   @db.VarChar(45)
+
+  ngay_tao            DateTime  @default(now())
+  ngay_cap_nhat       DateTime  @updatedAt
+
+  // Relations
+  doanh_nghiep        DoanhNghiep @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
+  nguoi_dung          NguoiDung   @relation(fields: [nguoi_dung_id], references: [id], onDelete: Cascade)
+
+  @@index([nguoi_dung_id])
+  @@index([ngay_het_han])
+  @@index([da_revoke])
+  @@map("refresh_token")
 }
 
 model KhachHang {
@@ -885,4 +965,36 @@ enum ChuKyThanhToan {
   thang
   quy
   nam
+}
+
+// ============================================================
+// ENUM: Hành động cho Audit Log
+// ============================================================
+enum HanhDong {
+  // CRUD Operations
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+
+  // Authentication
+  LOGIN
+  LOGOUT
+  REGISTER
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+
+  // Business Operations
+  ASSIGN
+  APPROVE
+  REJECT
+  COMPLETE
+  CANCEL
+
+  // Data Operations
+  EXPORT
+  IMPORT
+
+  // System
+  SYSTEM
 }
