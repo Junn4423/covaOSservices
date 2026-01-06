@@ -25,12 +25,12 @@ export interface ActiveUserData {
 }
 
 export const ActiveUser = createParamDecorator(
-    (field: keyof ActiveUserData | undefined, ctx: ExecutionContext): ActiveUserData | string => {
+    (field: keyof ActiveUserData | undefined, ctx: ExecutionContext): any => {
         const request = ctx.switchToHttp().getRequest();
         const user = request.user as ActiveUserData;
 
         if (!user) {
-            return null as any;
+            return null;
         }
 
         return field ? user[field] : user;

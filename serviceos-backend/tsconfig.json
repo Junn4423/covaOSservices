@@ -21,19 +21,19 @@
     "resolveJsonModule": true,
     "paths": {
       "@libs/database": [
-        "libs/database/src/index.ts"
+        "libs/database/src"
       ],
       "@libs/database/*": [
         "libs/database/src/*"
       ],
       "@libs/common": [
-        "libs/common/src/index.ts"
+        "libs/common/src"
       ],
       "@libs/common/*": [
         "libs/common/src/*"
       ],
       "@libs/modules": [
-        "libs/modules/src/index.ts"
+        "libs/modules/src"
       ],
       "@libs/modules/*": [
         "libs/modules/src/*"

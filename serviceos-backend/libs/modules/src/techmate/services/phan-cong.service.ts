@@ -8,7 +8,7 @@ export class PhanCongService {
 
     async assign(id_cong_viec: string, id_nguoi_dung: string, la_truong_nhom = false) {
         return this.prisma.phanCong.create({
-            data: { id: uuidv4(), id_cong_viec, id_nguoi_dung, la_truong_nhom: la_truong_nhom ? 1 : 0 },
+            data: { id: uuidv4(), id_cong_viec, id_nguoi_dung, la_truong_nhom: la_truong_nhom ? 1 : 0 } as any,
         });
     }
 

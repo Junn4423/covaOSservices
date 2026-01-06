@@ -85,7 +85,7 @@ export class NguoiDungService {
                 mat_khau: hashedPassword,
                 vai_tro: (data.vai_tro as any) || 'viewer',
                 trang_thai: 1,
-            },
+            } as any,
             select: {
                 id: true,
                 email: true,
@@ -104,7 +104,7 @@ export class NguoiDungService {
     }>) {
         return this.prisma.nguoiDung.update({
             where: { id },
-            data,
+            data: data as any,
             select: {
                 id: true,
                 email: true,
