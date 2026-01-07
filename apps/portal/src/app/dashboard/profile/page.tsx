@@ -7,14 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/store";
-import { api } from "@/lib/api";
+import { useAuthStore } from "@/stores";
+import httpClient, { uploadFile } from "@/lib/http";
 import type { UploadedFile } from "@/types";
 
 export default function ProfilePage() {
   const { toast } = useToast();
   const { user, setUser } = useAuthStore();
-  
+
   const [isUploading, setIsUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(user?.anh_dai_dien || "");
 
@@ -37,8 +37,8 @@ export default function ProfilePage() {
       setIsUploading(true);
 
       try {
-        const response = await api.storage.uploadImage(file, "avatars");
-        const uploadedFile = response.data as UploadedFile;
+        const result = await uploadFile("/storage/upload/image", file, { folder: "avatars" });
+        const uploadedFile = result.data as unknown as UploadedFile;
 
         // Update avatar URL
         setAvatarUrl(uploadedFile.url);
@@ -180,11 +180,11 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <Label>Plan</Label>
+              <Label>Ma doanh nghiep</Label>
               <Input
-                value={user?.doanh_nghiep?.goi_cuoc || "N/A"}
+                value={user?.doanh_nghiep?.ma_doanh_nghiep || "N/A"}
                 readOnly
-                className="mt-1 capitalize"
+                className="mt-1 uppercase"
               />
             </div>
             <div>

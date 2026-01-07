@@ -1,12 +1,13 @@
 /**
  * Socket.io Client Configuration
- * WebSocket connection with JWT authentication
+ * @deprecated Use @/lib/socket-manager instead
+ * 
+ * This file re-exports from the new socket-manager for backwards compatibility
  */
 
-import { io, Socket } from "socket.io-client";
+import { socketManager, ConnectionStatus, NotificationPayload, AlertPayload, BroadcastPayload } from "./socket-manager";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-
+// Re-export types
 export type SocketEventType =
   | "connected"
   | "disconnected"
@@ -41,128 +42,41 @@ export interface BroadcastEvent {
   message: string;
 }
 
-let socket: Socket | null = null;
-
 /**
- * Initialize socket connection with JWT token
+ * @deprecated Use socketManager.connect() instead
  */
-export function initializeSocket(token: string): Socket {
-  if (socket?.connected) {
-    return socket;
-  }
-
-  socket = io(SOCKET_URL, {
-    auth: { token },
-    query: { token },
-    transports: ["websocket", "polling"],
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 1000,
-    timeout: 10000,
-  });
-
-  // Connection events
-  socket.on("connect", () => {
-    console.log("[Socket] Connected:", socket?.id);
-  });
-
-  socket.on("connected", (data) => {
-    console.log("[Socket] Authenticated:", data);
-  });
-
-  socket.on("disconnect", (reason) => {
-    console.log("[Socket] Disconnected:", reason);
-  });
-
-  socket.on("connect_error", (error) => {
-    console.error("[Socket] Connection error:", error.message);
-  });
-
-  socket.on("error", (error) => {
-    console.error("[Socket] Error:", error);
-  });
-
-  return socket;
+export function initializeSocket(token: string) {
+  socketManager.connect(token);
+  return socketManager;
 }
 
 /**
- * Get the current socket instance
+ * @deprecated Use socketManager.disconnect() instead
  */
-export function getSocket(): Socket | null {
-  return socket;
+export function disconnectSocket() {
+  socketManager.disconnect();
 }
 
 /**
- * Disconnect socket
+ * @deprecated Use socketManager directly
  */
-export function disconnectSocket(): void {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
+export function getSocket() {
+  return socketManager;
 }
 
 /**
- * Check if socket is connected
+ * @deprecated Use socketManager.isConnected() instead
  */
 export function isSocketConnected(): boolean {
-  return socket?.connected ?? false;
+  return socketManager.isConnected();
 }
 
 /**
- * Send a ping to keep connection alive
+ * @deprecated Use socketManager.emit() instead
  */
-export function sendPing(): void {
-  socket?.emit("ping");
+export function sendTestNotification(title: string, message: string) {
+  socketManager.emit("test:notification", { title, message });
 }
 
-/**
- * Join a room
- */
-export function joinRoom(room: string): void {
-  socket?.emit("join:room", { room });
-}
-
-/**
- * Leave a room
- */
-export function leaveRoom(room: string): void {
-  socket?.emit("leave:room", { room });
-}
-
-/**
- * Mark notification as read via socket
- */
-export function markNotificationRead(notificationId: string): void {
-  socket?.emit("notification:read", { notificationId });
-}
-
-/**
- * Request notification count
- */
-export function requestNotificationCount(): void {
-  socket?.emit("notification:count");
-}
-
-/**
- * Send test notification (for development)
- */
-export function sendTestNotification(title?: string, message?: string): void {
-  socket?.emit("test:notification", { title, message });
-}
-
-/**
- * Send a message to a room
- */
-export function sendMessage(roomId: string, content: string, replyTo?: string): void {
-  socket?.emit("message", { roomId, content, replyTo });
-}
-
-/**
- * Send typing indicator
- */
-export function sendTyping(roomId: string, isTyping: boolean): void {
-  socket?.emit("typing", { roomId, isTyping });
-}
-
-export default socket;
+export { socketManager };
+export type { ConnectionStatus };

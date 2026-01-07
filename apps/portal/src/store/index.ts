@@ -1,7 +1,17 @@
 /**
- * Store Exports
- * Centralized export for all Zustand stores
+ * Store Index - Re-export from new stores location
+ * @deprecated Use @/stores instead
  */
 
-export { useAuthStore } from "./auth.store";
-export { useSocketStore } from "./socket.store";
+export {
+    useAuthStore,
+    initializeAuth,
+    isAuthInitialized
+} from "@/stores/auth.store";
+export type { User, UserRole, LoginCredentials, AuthState } from "@/stores/auth.store";
+
+export {
+    useSocketStore,
+    getSocketStatus,
+    isSocketConnected
+} from "@/stores/socket.store";

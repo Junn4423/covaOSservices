@@ -1,190 +1,208 @@
+/**
+ * Dashboard Home Page
+ * Overview with stats and quick access
+ */
+
 "use client";
 
-import Link from "next/link";
+import { useAuthStore } from "@/stores";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuthStore, useSocketStore } from "@/store";
+import { MODULES } from "@/config";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export default function DashboardPage() {
-  const { user } = useAuthStore();
-  const { isConnected, unreadCount } = useSocketStore();
+// ============================================================================
+// STAT CARD COMPONENT
+// ============================================================================
 
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  description: string;
+  color: string;
+}
+
+function StatCard({ title, value, description, color }: StatCardProps) {
   return (
-    <div className="space-y-8">
-      {/* Welcome section */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Xin chao, {user?.ho_ten || "Ban"}!
-        </h2>
-        <p className="text-muted-foreground mt-2">
-          Đây là tổng quan của ServiceOS Portal
-        </p>
-      </div>
+    <Card className="relative overflow-hidden">
+      <div className={cn("absolute top-0 left-0 w-1 h-full", color)} />
+      <CardHeader className="pb-2">
+        <CardDescription>{title}</CardDescription>
+        <CardTitle className="text-3xl font-bold">{value}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
 
-      {/* Stats cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Trạng thái kết nối</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <div
-                className={`h-3 w-3 rounded-full transition-all duration-300 ${isConnected ? "bg-green-500 animate-pulse shadow-lg shadow-green-500/50" : "bg-red-500"
-                  }`}
-              />
-              <span className="text-2xl font-bold">
-                {isConnected ? "Truc tuyen" : "Ngoai tuyen"}
-              </span>
+// ============================================================================
+// MODULE CARD COMPONENT
+// ============================================================================
+
+interface ModuleCardProps {
+  href: string;
+  iconLetter: string;
+  label: string;
+  description: string;
+  color: string;
+}
+
+function ModuleCard({ href, iconLetter, label, description, color }: ModuleCardProps) {
+  return (
+    <Link href={href}>
+      <Card className="group h-full hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white font-bold text-lg shadow-lg transition-transform group-hover:scale-110"
+              style={{ backgroundColor: color }}
+            >
+              {iconLetter}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              WebSocket {isConnected ? "da ket noi" : "chua ket noi"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Thong bao</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              {unreadCount}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Thông báo chưa đọc
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vai trò</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold capitalize bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              {user?.vai_tro || "N/A"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Vai trò tài khoản của bạn
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Doanh nghiệp</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold truncate bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-              {user?.doanh_nghiep?.ten_doanh_nghiep || "N/A"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Tổ chức của bạn
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Feature cards */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Link href="/dashboard/storage">
-          <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer h-full border-0 shadow-lg hover:scale-[1.02]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold shadow-lg">
-                  S
-                </span>
-                Quản lý Lưu trữ
-              </CardTitle>
-              <CardDescription>
-                Thử nghiệm chức năng tải lên tệp với MinIO/S3
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                  Tải lên hình ảnh (JPEG, PNG, WebP)
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                  Tải lên tài liệu (PDF, Word, Excel)
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                  Xem tệp đã tải lên với URL công khai
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                  Xóa tệp khỏi hệ thống lưu trữ
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/dashboard/realtime">
-          <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer h-full border-0 shadow-lg hover:scale-[1.02]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-teal-600 text-white text-sm font-bold shadow-lg">
-                  R
-                </span>
-                Thông báo Thời gian thực
-              </CardTitle>
-              <CardDescription>
-                Thu nghiệm kết nối WebSocket và thông báo trực tiếp
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                  Gửi thông báo thử nghiệm
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                  Xem danh sách thông báo thời gian thực
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                  Theo dõi trạng thái kết nối WebSocket
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                  Thử nghiệm tin nhắn phát sóng
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* API Info */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle>Thông tin API</CardTitle>
-          <CardDescription>
-            Chi tiết kết nối Backend
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="p-4 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-              <p className="text-sm font-medium">API URL</p>
-              <p className="text-sm text-muted-foreground font-mono mt-1">
-                {process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-              <p className="text-sm font-medium">WebSocket URL</p>
-              <p className="text-sm text-muted-foreground font-mono mt-1">
-                {process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001"}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                {label}
+              </h3>
+              <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+                {description}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
+    </Link>
+  );
+}
+
+// ============================================================================
+// DASHBOARD PAGE
+// ============================================================================
+
+export default function DashboardPage() {
+  const { user } = useAuthStore();
+
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Chao buoi sang";
+    if (hour < 18) return "Chao buoi chieu";
+    return "Chao buoi toi";
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-white">
+        <p className="text-indigo-200">{getGreeting()},</p>
+        <h1 className="text-3xl font-bold mt-1">
+          {user?.ho_ten || "Nguoi dung"}
+        </h1>
+        <p className="text-indigo-100 mt-2">
+          Chao mung ban quay tro lai voi ServiceOS
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Cong viec hom nay"
+          value="12"
+          description="Tang 8% so voi hom qua"
+          color="bg-indigo-500"
+        />
+        <StatCard
+          title="Khach hang moi"
+          value="24"
+          description="Tuan nay"
+          color="bg-emerald-500"
+        />
+        <StatCard
+          title="Doanh thu"
+          value="45.2M"
+          description="Thang nay"
+          color="bg-amber-500"
+        />
+        <StatCard
+          title="Nhan vien hoat dong"
+          value="18"
+          description="Dang truc tuyen"
+          color="bg-purple-500"
+        />
+      </div>
+
+      {/* Modules Grid */}
+      <div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
+          Cac module he thong
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {MODULES.map((module) => (
+            <ModuleCard
+              key={module.id}
+              href={module.href}
+              iconLetter={module.iconLetter}
+              label={module.label}
+              description={module.description}
+              color={module.color}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
+          Hanh dong nhanh
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Link
+            href="/dashboard/jobs"
+            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xl mb-3">
+              +
+            </div>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Tao cong viec
+            </span>
+          </Link>
+          <Link
+            href="/dashboard/customers"
+            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xl mb-3">
+              +
+            </div>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Them khach hang
+            </span>
+          </Link>
+          <Link
+            href="/dashboard/quotes"
+            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xl mb-3">
+              +
+            </div>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Tao bao gia
+            </span>
+          </Link>
+          <Link
+            href="/dashboard/inventory"
+            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xl mb-3">
+              +
+            </div>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Nhap kho
+            </span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

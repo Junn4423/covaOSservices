@@ -1,73 +1,46 @@
+/**
+ * Realtime Demo Page
+ * Testing WebSocket connection and notifications
+ */
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useSocketStore, useAuthStore } from "@/store";
-import { initializeSocket, getSocket } from "@/lib/socket";
+import { useSocketStore } from "@/stores";
+import { socketManager } from "@/lib/socket-manager";
 
 export default function RealtimeDemoPage() {
   const { toast } = useToast();
-  const { accessToken } = useAuthStore();
-  const {
-    isConnected,
-    connectionError,
-    notifications,
-    unreadCount,
-    sendTestNotification,
-    clearNotifications,
-    addNotification,
-    connect,
-  } = useSocketStore();
+  const { status, notifications, unreadCount, clearNotifications, addNotification } = useSocketStore();
 
-  const [testTitle, setTestTitle] = useState("Thông báo thử nghiệm");
-  const [testMessage, setTestMessage] = useState("Đây là thông báo thử nghiệm từ bảng điều khiển.");
+  const [testTitle, setTestTitle] = useState("Thong bao thu nghiem");
+  const [testMessage, setTestMessage] = useState("Day la thong bao thu nghiem tu bang dieu khien.");
 
-  // Initialize socket connection when component mounts
-  useEffect(() => {
-    if (accessToken && !isConnected) {
-      connect(accessToken);
-    }
-  }, [accessToken, isConnected, connect]);
+  const isConnected = status === "connected";
+  const connectionError = status === "error" ? "Loi ket noi" : null;
 
-  // Listen for notification events and show toast
-  useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-
-    const handleNotification = (data: any) => {
-      toast({
-        title: data.tieuDe || "Thông báo mới",
-        description: data.noiDung || "",
-        variant: "default",
-      });
-    };
-
-    socket.on("notification", handleNotification);
-
-    return () => {
-      socket.off("notification", handleNotification);
-    };
-  }, [toast]);
+  // Socket is already connected by auth store - no need to connect here
 
   // Send test notification via socket
   const handleSendTest = () => {
     if (!isConnected) {
       toast({
-        title: "Chưa kết nối",
-        description: "WebSocket chưa kết nối. Vui lòng đợi hoặc tải lại trang.",
+        title: "Chua ket noi",
+        description: "WebSocket chua ket noi. Vui long doi hoac tai lai trang.",
         variant: "destructive",
       });
       return;
     }
 
-    sendTestNotification(testTitle, testMessage);
+    socketManager.emit("test:notification", { title: testTitle, message: testMessage });
     toast({
-      title: "Đã gửi thử",
-      description: "Yêu cầu thông báo thử nghiệm đã được gửi đến máy chủ.",
+      title: "Da gui thu",
+      description: "Yeu cau thong bao thu nghiem da duoc gui den may chu.",
       variant: "default",
     });
   };
@@ -82,8 +55,8 @@ export default function RealtimeDemoPage() {
       timestamp: new Date(),
     });
     toast({
-      title: "Đã thêm thông báo cục bộ",
-      description: "Đã thêm vào danh sách thông báo (chỉ trên máy của bạn)",
+      title: "Da them thong bao cuc bo",
+      description: "Da them vao danh sach thong bao (chi tren may cua ban)",
       variant: "default",
     });
   };
@@ -113,19 +86,19 @@ export default function RealtimeDemoPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Thông báo Thời gian thực
+          Thong bao Thoi gian thuc
         </h2>
         <p className="text-muted-foreground">
-          Kiểm tra kết nối WebSocket và thông báo trực tiếp
+          Kiem tra ket noi WebSocket va thong bao truc tiep
         </p>
       </div>
 
       {/* Connection status */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Trạng thái Kết nối</CardTitle>
+          <CardTitle>Trang thai Ket noi</CardTitle>
           <CardDescription>
-            Kết nối WebSocket đến máy chủ backend
+            Ket noi WebSocket den may chu backend
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,7 +109,7 @@ export default function RealtimeDemoPage() {
                   }`}
               />
               <span className="font-medium">
-                {isConnected ? "Da ket noi" : "Chua ket noi"}
+                {isConnected ? "Da ket noi" : status === "connecting" ? "Dang ket noi..." : "Chua ket noi"}
               </span>
             </div>
 
@@ -155,13 +128,13 @@ export default function RealtimeDemoPage() {
               </p>
             </div>
             <div className="rounded-lg border p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-              <p className="text-sm text-muted-foreground">Số chưa đọc</p>
+              <p className="text-sm text-muted-foreground">So chua doc</p>
               <p className="text-2xl font-bold mt-1 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 {unreadCount}
               </p>
             </div>
             <div className="rounded-lg border p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
-              <p className="text-sm text-muted-foreground">Tổng thông báo</p>
+              <p className="text-sm text-muted-foreground">Tong thong bao</p>
               <p className="text-2xl font-bold mt-1 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 {notifications.length}
               </p>
@@ -173,30 +146,30 @@ export default function RealtimeDemoPage() {
       {/* Send test notification */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Gửi thông báo thử nghiệm</CardTitle>
+          <CardTitle>Gui thong bao thu nghiem</CardTitle>
           <CardDescription>
-            Gửi thông báo thử nghiệm qua máy chủ WebSocket
+            Gui thong bao thu nghiem qua may chu WebSocket
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <Label htmlFor="title">Tiêu đề</Label>
+              <Label htmlFor="title">Tieu de</Label>
               <Input
                 id="title"
                 value={testTitle}
                 onChange={(e) => setTestTitle(e.target.value)}
-                placeholder="Tiêu đề thông báo"
+                placeholder="Tieu de thong bao"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="message">Nội dung</Label>
+              <Label htmlFor="message">Noi dung</Label>
               <Input
                 id="message"
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
-                placeholder="Nội dung thông báo"
+                placeholder="Noi dung thong bao"
                 className="mt-1"
               />
             </div>
@@ -208,20 +181,20 @@ export default function RealtimeDemoPage() {
               disabled={!isConnected}
               className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
             >
-              Gửi qua Socket
+              Gui qua Socket
             </Button>
             <Button onClick={handleAddLocal} variant="outline" className="transition-all duration-200 hover:shadow-md">
-              Thêm cục bộ (Thu UI)
+              Them cuc bo (Thu UI)
             </Button>
             <Button onClick={clearNotifications} variant="destructive" className="transition-all duration-200">
-              Xóa tất cả
+              Xoa tat ca
             </Button>
           </div>
 
           {!isConnected && (
             <p className="text-sm text-muted-foreground p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800">
-              Lưu ý: WebSocket chưa kết nối. Nút "Gửi qua Socket" cần kết nối đang hoạt động.
-              Bạn vẫn có thể thử giao diện với "Thêm cục bộ".
+              Luu y: WebSocket chua ket noi. Nut "Gui qua Socket" can ket noi dang hoat dong.
+              Ban van co the thu giao dien voi "Them cuc bo".
             </p>
           )}
         </CardContent>
@@ -230,18 +203,18 @@ export default function RealtimeDemoPage() {
       {/* Notification feed */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Danh sách thông báo</CardTitle>
+          <CardTitle>Danh sach thong bao</CardTitle>
           <CardDescription>
-            Thông báo thời gian thực nhận từ máy chủ
+            Thong bao thoi gian thuc nhan tu may chu
           </CardDescription>
         </CardHeader>
         <CardContent>
           {notifications.length === 0 ? (
             <div className="text-center py-12 rounded-lg bg-gray-50 dark:bg-gray-800/50">
               <div className="text-4xl text-gray-300 mb-2">?</div>
-              <p className="text-muted-foreground">Chưa có thông báo nào</p>
+              <p className="text-muted-foreground">Chua co thong bao nao</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Gửi thông báo thử nghiệm hoặc đổi sự kiện từ máy chủ
+                Gui thong bao thu nghiem hoac doi su kien tu may chu
               </p>
             </div>
           ) : (
@@ -254,12 +227,12 @@ export default function RealtimeDemoPage() {
                   {/* Icon based on type */}
                   <div
                     className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${notification.loaiThongBao?.includes("ALERT")
-                        ? "bg-red-100 text-red-600 dark:bg-red-900/50"
-                        : notification.loaiThongBao?.includes("BROADCAST")
-                          ? "bg-purple-100 text-purple-600 dark:bg-purple-900/50"
-                          : notification.loaiThongBao?.includes("LOCAL")
-                            ? "bg-gray-100 text-gray-600 dark:bg-gray-700"
-                            : "bg-blue-100 text-blue-600 dark:bg-blue-900/50"
+                      ? "bg-red-100 text-red-600 dark:bg-red-900/50"
+                      : notification.loaiThongBao?.includes("BROADCAST")
+                        ? "bg-purple-100 text-purple-600 dark:bg-purple-900/50"
+                        : notification.loaiThongBao?.includes("LOCAL")
+                          ? "bg-gray-100 text-gray-600 dark:bg-gray-700"
+                          : "bg-blue-100 text-blue-600 dark:bg-blue-900/50"
                       }`}
                   >
                     <span className="text-sm font-bold">
@@ -299,35 +272,35 @@ export default function RealtimeDemoPage() {
       {/* Instructions */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Hướng dẫn Sử dụng</CardTitle>
+          <CardTitle>Huong dan Su dung</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-muted-foreground">
           <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-            <p className="font-medium text-foreground">1. Kết nối WebSocket</p>
+            <p className="font-medium text-foreground">1. Ket noi WebSocket</p>
             <p>
-              Khi bạn đăng nhập, frontend tự động kết nối đến máy chủ WebSocket
-              sử dụng JWT token để xác thực.
+              Khi ban dang nhap, frontend tu dong ket noi den may chu WebSocket
+              su dung JWT token de xac thuc.
             </p>
           </div>
           <div className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
-            <p className="font-medium text-foreground">2. Thông báo theo Phòng</p>
+            <p className="font-medium text-foreground">2. Thong bao theo Phong</p>
             <p>
-              Mỗi người dùng tự động tham gia phòng cá nhân (user:userId) và phòng
-              doanh nghiệp (tenant:tenantId) để nhận thông báo trực tiếp.
+              Moi nguoi dung tu dong tham gia phong ca nhan (user:userId) va phong
+              doanh nghiep (tenant:tenantId) de nhan thong bao truc tiep.
             </p>
           </div>
           <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950">
-            <p className="font-medium text-foreground">3. Thông báo thử nghiệm</p>
+            <p className="font-medium text-foreground">3. Thong bao thu nghiem</p>
             <p>
-              Nút "Gửi qua Socket" gửi sự kiện test:notification đến máy chủ,
-              sau đó máy chủ gửi thông báo lại cho socket của bạn.
+              Nut "Gui qua Socket" gui su kien test:notification den may chu,
+              sau do may chu gui thong bao lai cho socket cua ban.
             </p>
           </div>
           <div className="p-4 rounded-lg bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
-            <p className="font-medium text-foreground">4. Tích hợp Sản xuất</p>
+            <p className="font-medium text-foreground">4. Tich hop San xuat</p>
             <p>
-              Trong môi trường sản xuất, các dịch vụ backend sử dụng RealtimeService.notifyUser()
-              để đẩy thông báo đến người dùng cụ thể theo thời gian thực.
+              Trong moi truong san xuat, cac dich vu backend su dung RealtimeService.notifyUser()
+              de day thong bao den nguoi dung cu the theo thoi gian thuc.
             </p>
           </div>
         </CardContent>

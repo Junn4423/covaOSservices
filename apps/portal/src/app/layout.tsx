@@ -1,13 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { QueryProvider } from "@/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "ServiceOS Portal",
-  description: "Multi-tenant SaaS Platform for Service Businesses",
+  description: "Nen tang quan ly dich vu doanh nghiep da doi tuong",
+  keywords: ["ServiceOS", "SaaS", "Multi-tenant", "Enterprise", "Service Management"],
+  authors: [{ name: "ServiceOS Team" }],
 };
 
 export default function RootLayout({
@@ -18,8 +26,10 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={inter.className}>
-        {children}
-        <Toaster />
+        <QueryProvider>
+          {children}
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );
