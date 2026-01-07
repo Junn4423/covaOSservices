@@ -4,11 +4,11 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 XỬ LÝ DECIMAL:
+ *  XỬ LÝ DECIMAL:
  * Prisma trả về Prisma.Decimal object. Service này sẽ convert
  * sang number trước khi trả về cho Frontend.
  *
- * 📌 LOGIC BUSINESS:
+ *  LOGIC BUSINESS:
  * - Tự động sinh mã phiếu: PT-{Time} hoặc PC-{Time}
  * - Validate số tiền > 0
  * - Ngày thực hiện default là now() nếu không gửi
