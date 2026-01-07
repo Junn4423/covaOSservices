@@ -4,7 +4,7 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 🔥 CRITICAL SECURITY COMPONENT - VERSION 2.0 (nestjs-cls)
+ *  CRITICAL SECURITY COMPONENT - VERSION 2.0 (nestjs-cls)
  *
  * THAY ĐỔI QUAN TRỌNG SO VỚI PHIÊN BẢN TRƯỚC:
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
