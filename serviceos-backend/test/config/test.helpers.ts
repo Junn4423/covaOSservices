@@ -248,6 +248,36 @@ export class ApiTestHelper {
     }
 
     /**
+     * GET Request KHONG co token (test unauthorized access)
+     */
+    async getWithoutAuth(
+        endpoint: string,
+        query?: Record<string, any>,
+        options?: ApiTestOptions
+    ): Promise<request.Response> {
+        const startTime = Date.now();
+        const fullEndpoint = this.baseUrl + endpoint;
+
+        let req = request(this.app.getHttpServer())
+            .get(fullEndpoint);
+
+        if (query) {
+            req = req.query(query);
+        }
+
+        // Khong set Authorization header
+
+        const response = await req;
+        const duration = Date.now() - startTime;
+
+        if (options && !options.skipReport) {
+            this.reportResult('GET', fullEndpoint, response, duration, options.tenTest);
+        }
+
+        return response;
+    }
+
+    /**
      * DELETE Request với auto-reporting
      */
     async delete(

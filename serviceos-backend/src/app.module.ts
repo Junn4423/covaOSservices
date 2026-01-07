@@ -34,6 +34,7 @@ import {
     CustomerPortalModule,
     NotificationModule,
     BillingModule,
+    AnalyticsModule,
     // Uncomment khi implement cac module khac:
     // CashFlowModule,
     // ProcurePoolModule,
@@ -77,6 +78,7 @@ import { AppService } from './app.service';
         CustomerPortalModule,    // Phase 13: Customer Portal
         NotificationModule,      // Phase 13: Notification System
         BillingModule,           // Phase 14: SaaS Subscription Management
+        AnalyticsModule,         // Phase 15: Analytics Dashboard
     ],
     controllers: [AppController],
     providers: [

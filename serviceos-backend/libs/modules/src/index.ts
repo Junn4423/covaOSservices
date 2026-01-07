@@ -11,3 +11,4 @@ export * from './customerportal';
 export * from './procurepool';
 export * from './notification';
 export * from './billing';
+export * from './analytics';
