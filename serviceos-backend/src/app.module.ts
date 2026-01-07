@@ -27,11 +27,11 @@ import {
     CoreModule,
     TechMateModule,
     StockPileModule,
+    QuoteMasterModule,
     // Uncomment khi implement các module khác:
     // ShiftSquadModule,
     // AssetTrackModule,
     // RouteOptimaModule,
-    // QuoteMasterModule,
     // CashFlowModule,
     // CustomerPortalModule,
     // ProcurePoolModule,
@@ -70,6 +70,7 @@ import { AppService } from './app.service';
         CoreModule,
         TechMateModule,
         StockPileModule,
+        QuoteMasterModule,  // Phase 5: Báo giá
     ],
     controllers: [AppController],
     providers: [

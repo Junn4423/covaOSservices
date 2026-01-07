@@ -456,7 +456,7 @@ model SanPham {
   nhom_san_pham         NhomSanPham?    @relation(fields: [id_nhom_san_pham], references: [id], onDelete: SetNull)
   ton_kho               TonKho[]
   lich_su_kho           LichSuKho[]
-  chi_tiet_bao_gia      ChiTietBaoGia[]
+  chi_tiet_bao_gia      ChiTietBaoGia[]   // Các chi tiết báo giá liên quan
   chi_tiet_don_dat_hang ChiTietDonDatHang[]
 
   @@unique([ma_san_pham, id_doanh_nghiep])              // Mã SP unique per tenant
@@ -639,57 +639,73 @@ model DiemDung {
 // ============================================================
 
 model BaoGia {
-  id              String    @id @default(uuid()) @db.Char(36)
-  id_doanh_nghiep String    @db.Char(36)
-  id_khach_hang   String?   @db.Char(36)
-  ma_bao_gia      String?   @db.VarChar(50)
-  tieu_de         String?   @db.VarChar(255)
-  tong_tien       Decimal   @default(0) @db.Decimal(19, 4)
-  thue_vat        Decimal   @default(0) @db.Decimal(5, 2)
-  chiet_khau      Decimal   @default(0) @db.Decimal(19, 4)
-  tong_thanh_toan Decimal   @default(0) @db.Decimal(19, 4)
-  ngay_het_han    DateTime? @db.Date
-  trang_thai      Int       @default(0) @db.TinyInt
-  ghi_chu         String?   @db.Text
-  ngay_tao        DateTime  @default(now())
-  ngay_cap_nhat   DateTime  @updatedAt
-  ngay_xoa        DateTime?
-  nguoi_tao_id    String?   @db.Char(36)
-  nguoi_cap_nhat_id String? @db.Char(36)
+  id                    String          @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep       String          @db.Char(36)
+  id_khach_hang         String          @db.Char(36)           // Required: Báo giá phải có khách hàng
+  ma_bao_gia            String          @db.VarChar(50)        // Auto-gen: BG-{Timestamp}
+  tieu_de               String?         @db.VarChar(255)
+  
+  // Ngày tháng
+  ngay_bao_gia          DateTime        @default(now())        // Ngày lập báo giá
+  ngay_het_han          DateTime?       @db.Date               // Ngày hết hạn báo giá
+  
+  // Trạng thái báo giá (Enum string)
+  trang_thai            TrangThaiBaoGia @default(DRAFT)        // DRAFT, SENT, ACCEPTED, REJECTED, EXPIRED
+  
+  // Tính toán tiền tệ
+  tong_tien_truoc_thue  Decimal         @default(0) @db.Decimal(19, 4)  // Tổng tiền trước VAT
+  thue_vat              Decimal         @default(10) @db.Decimal(5, 2)  // % VAT (mặc định 10%)
+  tien_thue             Decimal         @default(0) @db.Decimal(19, 4)  // Tiền thuế = tong_tien_truoc_thue * thue_vat / 100
+  tong_tien_sau_thue    Decimal         @default(0) @db.Decimal(19, 4)  // Tổng sau thuế = trước thuế + tiền thuế
+  
+  ghi_chu               String?         @db.Text
+
+  // Audit fields
+  ngay_tao              DateTime        @default(now())
+  nguoi_tao_id          String?         @db.Char(36)
+  ngay_cap_nhat         DateTime        @updatedAt
+  nguoi_cap_nhat_id     String?         @db.Char(36)
+  ngay_xoa              DateTime?
 
   // Relations
-  doanh_nghiep     DoanhNghiep       @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
-  khach_hang       KhachHang?        @relation(fields: [id_khach_hang], references: [id], onDelete: SetNull)
-  chi_tiet_bao_gia ChiTietBaoGia[]
-  hop_dong         HopDong[]
+  doanh_nghiep          DoanhNghiep     @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
+  khach_hang            KhachHang       @relation(fields: [id_khach_hang], references: [id], onDelete: Cascade)
+  chi_tiet              ChiTietBaoGia[]
+  hop_dong              HopDong[]
 
+  @@unique([ma_bao_gia, id_doanh_nghiep])  // Mã báo giá unique trong 1 doanh nghiệp
+  @@index([id_doanh_nghiep])
+  @@index([id_khach_hang])
   @@index([trang_thai])
+  @@index([ngay_bao_gia])
   @@map("bao_gia")
 }
 
 model ChiTietBaoGia {
-  id              String    @id @default(uuid()) @db.Char(36)
-  id_doanh_nghiep String    @db.Char(36)
-  id_bao_gia      String    @db.Char(36)
-  id_san_pham     String?   @db.Char(36)
-  ten_hang_muc    String    @db.VarChar(255)
-  mo_ta           String?   @db.Text
-  don_vi          String?   @db.VarChar(50)
-  so_luong        Decimal   @default(1) @db.Decimal(10, 2)
-  don_gia         Decimal   @default(0) @db.Decimal(19, 4)
-  thanh_tien      Decimal   @default(0) @db.Decimal(19, 4)
-  thu_tu          Int       @default(0)
-  ngay_tao        DateTime  @default(now())
-  ngay_cap_nhat   DateTime  @updatedAt
-  ngay_xoa        DateTime?
-  nguoi_tao_id    String?   @db.Char(36)
-  nguoi_cap_nhat_id String? @db.Char(36)
+  id                String    @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep   String    @db.Char(36)
+  id_bao_gia        String    @db.Char(36)
+  id_san_pham       String    @db.Char(36)           // Required: FK đến SanPham
+  
+  so_luong          Int       @default(1)            // Số lượng (Int thay vì Decimal)
+  don_gia           Decimal   @default(0) @db.Decimal(19, 4)  // Giá tại thời điểm báo giá (snapshot)
+  thanh_tien        Decimal   @default(0) @db.Decimal(19, 4)  // = so_luong * don_gia
+  ghi_chu           String?   @db.VarChar(500)
+
+  // Audit fields
+  ngay_tao          DateTime  @default(now())
+  nguoi_tao_id      String?   @db.Char(36)
+  ngay_cap_nhat     DateTime  @updatedAt
+  nguoi_cap_nhat_id String?   @db.Char(36)
+  ngay_xoa          DateTime?
 
   // Relations
-  doanh_nghiep DoanhNghiep @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
-  bao_gia      BaoGia      @relation(fields: [id_bao_gia], references: [id], onDelete: Cascade)
-  san_pham     SanPham?    @relation(fields: [id_san_pham], references: [id], onDelete: SetNull)
+  doanh_nghiep      DoanhNghiep @relation(fields: [id_doanh_nghiep], references: [id], onDelete: Cascade)
+  bao_gia           BaoGia      @relation(fields: [id_bao_gia], references: [id], onDelete: Cascade)
+  san_pham          SanPham     @relation(fields: [id_san_pham], references: [id], onDelete: Cascade)
 
+  @@index([id_bao_gia])
+  @@index([id_san_pham])
   @@map("chi_tiet_bao_gia")
 }
 
@@ -1002,6 +1018,15 @@ enum LoaiSanPham {
   HANG_HOA    // Hàng hóa vật lý
   DICH_VU     // Dịch vụ
   COMBO       // Gói combo
+}
+
+// Trạng thái báo giá - dùng cho QuoteMaster
+enum TrangThaiBaoGia {
+  DRAFT       // Bản nháp
+  SENT        // Đã gửi khách hàng
+  ACCEPTED    // Khách đã chấp nhận
+  REJECTED    // Khách từ chối
+  EXPIRED     // Đã hết hạn
 }
 
 enum LoaiKho {

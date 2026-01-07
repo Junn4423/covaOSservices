@@ -106,7 +106,7 @@ const SYSTEM_TABLES = ['DoanhNghiep', 'ThanhToanSaas'];
  *
  * QUAN TRỌNG: Không còn Scope.REQUEST → Connection Pool được tận dụng!
  */
-@Injectable() // 🔥 SINGLETON - Không còn { scope: Scope.REQUEST }
+@Injectable() // SINGLETON - Không còn { scope: Scope.REQUEST }
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(PrismaService.name);
 
@@ -122,22 +122,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     async onModuleInit() {
         await this.$connect();
         this.applyTenantMiddleware();
-        this.logger.log('✅ PrismaService initialized (Singleton + CLS)');
+        this.logger.log('PrismaService initialized (Singleton + CLS)');
     }
 
     async onModuleDestroy() {
         await this.$disconnect();
-        this.logger.log('🔌 PrismaService disconnected');
+        this.logger.log('PrismaService disconnected');
     }
 
-    // ============================================================
-    // CLS CONTEXT METHODS
-    // ============================================================
-
-    /**
-     * Lấy tenant ID từ CLS context
-     * 🔥 THAY ĐỔI: Đọc từ ClsService thay vì request object
-     */
     private getTenantId(): string | null {
         return this.cls.get('tenantId') || null;
     }
@@ -165,14 +157,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         return TENANT_TABLES.includes(model);
     }
 
-    /**
-     * ============================================================
-     * 🔥 CORE: Multi-tenant Middleware
-     * ============================================================
-     *
-     * Tự động inject tenant ID vào mọi query để đảm bảo
-     * dữ liệu của tenant A không thể truy cập bởi tenant B
-     */
     private applyTenantMiddleware() {
         this.$use(async (params, next) => {
             const tenantId = this.getTenantId();

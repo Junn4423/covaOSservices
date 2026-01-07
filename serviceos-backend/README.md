@@ -1,8 +1,8 @@
-# 🚀 ServiceOS Backend
+# ServiceOS Backend
 
 ## Hệ sinh thái SaaS Multi-tenant cho Doanh nghiệp Dịch vụ
 
-### 📁 Cấu trúc Monorepo
+### Cấu trúc Monorepo
 
 ```
 serviceos-backend/
@@ -13,7 +13,7 @@ serviceos-backend/
 ├── libs/
 │   ├── database/                 # Database Library
 │   │   └── src/
-│   │       ├── prisma.service.ts # 🔥 Multi-tenant Middleware
+│   │       ├── prisma.service.ts # Multi-tenant Middleware
 │   │       └── database.module.ts
 │   │
 │   ├── common/                   # Shared Utilities
@@ -46,7 +46,7 @@ serviceos-backend/
 
 ---
 
-### 🔐 Multi-tenant Architecture
+### Multi-tenant Architecture
 
 #### Cách hoạt động:
 
@@ -59,7 +59,7 @@ serviceos-backend/
 
 ---
 
-### 🛠️ Quick Start
+### Quick Start
 
 ```bash
 # 1. Cài dependencies
@@ -81,7 +81,7 @@ npm run start:dev
 
 ---
 
-### 📚 API Documentation
+### API Documentation
 
 Sau khi chạy server, truy cập:
 - **Swagger UI**: http://localhost:3001/docs
