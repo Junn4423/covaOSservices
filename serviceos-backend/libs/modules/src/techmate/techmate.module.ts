@@ -14,6 +14,9 @@
  * - /techmate/cong-viec/*
  * - /techmate/evidence/*
  * - /techmate/khach-hang/*
+ * 
+ * Integration:
+ * - NotificationModule: Gui thong bao khi phan cong nhan vien
  */
 
 import { Module } from '@nestjs/common';
@@ -23,8 +26,10 @@ import { PhanCongService } from './services/phan-cong.service';
 import { NghiemThuHinhAnhService } from './services/nghiem-thu-hinh-anh.service';
 import { KhachHangService } from './services/khach-hang.service';
 import { KhachHangController } from './controllers/khach-hang.controller';
+import { NotificationModule } from '../notification';
 
 @Module({
+    imports: [NotificationModule],
     controllers: [
         CongViecController,
         NghiemThuHinhAnhController,

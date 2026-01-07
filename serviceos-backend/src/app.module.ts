@@ -31,11 +31,11 @@ import {
     ShiftSquadModule,
     AssetTrackModule,
     RouteOptimaModule,
+    CustomerPortalModule,
+    NotificationModule,
     // Uncomment khi implement cac module khac:
     // CashFlowModule,
-    // CustomerPortalModule,
     // ProcurePoolModule,
-    // NotificationModule,
     // BillingModule,
 } from '@libs/modules';
 
@@ -70,10 +70,12 @@ import { AppService } from './app.service';
         CoreModule,
         TechMateModule,
         StockPileModule,
-        QuoteMasterModule,  // Phase 5: Bao gia
-        ShiftSquadModule,   // Phase 11: HR & Timekeeping
-        AssetTrackModule,   // Phase 12: Asset Management
-        RouteOptimaModule,  // Phase 12: Route Management
+        QuoteMasterModule,       // Phase 5: Bao gia
+        ShiftSquadModule,        // Phase 11: HR & Timekeeping
+        AssetTrackModule,        // Phase 12: Asset Management
+        RouteOptimaModule,       // Phase 12: Route Management
+        CustomerPortalModule,    // Phase 13: Customer Portal
+        NotificationModule,      // Phase 13: Notification System
     ],
     controllers: [AppController],
     providers: [
@@ -87,3 +89,4 @@ import { AppService } from './app.service';
     ],
 })
 export class AppModule { }
+

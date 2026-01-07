@@ -10,6 +10,9 @@
  * - getByJob: Lấy danh sách phân công theo công việc
  * - getByUser: Lấy danh sách phân công theo user
  * - updateAssignment: Cập nhật thông tin phân công
+ * 
+ * Integration:
+ * - NotificationModule: Gui thong bao khi phan cong nhan vien
  */
 
 import {
@@ -26,10 +29,14 @@ import {
     UpdatePhanCongDto,
     TrangThaiPhanCong,
 } from '../dto/phan-cong.dto';
+import { ThongBaoService, LoaiThongBao, LoaiDoiTuong } from '../../notification';
 
 @Injectable()
 export class PhanCongService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private thongBaoService: ThongBaoService,
+    ) { }
 
     // ============================================================
     // ASSIGN STAFF - Phân công nhân viên vào công việc
@@ -132,6 +139,20 @@ export class PhanCongService {
                 },
             },
         });
+
+        // Gửi thông báo cho kỹ thuật viên được phân công
+        await this.thongBaoService.createNotification(
+            {
+                id_nguoi_nhan: dto.id_nguoi_dung,
+                tieu_de: `Bạn được phân công vào công việc: ${congViec.tieu_de}`,
+                noi_dung: `Công việc: ${congViec.ma_cong_viec || jobId}\nNgày hẹn: ${congViec.ngay_hen ? new Date(congViec.ngay_hen).toLocaleDateString('vi-VN') : 'Chưa xác định'}`,
+                loai_thong_bao: LoaiThongBao.PHAN_CONG,
+                id_doi_tuong_lien_quan: jobId,
+                loai_doi_tuong: LoaiDoiTuong.CONG_VIEC,
+            },
+            tenantId,
+            userId,
+        );
 
         return phanCong;
     }

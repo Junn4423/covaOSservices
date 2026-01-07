@@ -16,6 +16,9 @@
  * - Snapshot giá sản phẩm tại thời điểm tạo báo giá
  * -  Convert báo giá -> hợp đồng
  * - Quản lý vòng đời hợp đồng (DRAFT -> ACTIVE -> LIQUIDATED/EXPIRED)
+ * 
+ * Integration:
+ * - NotificationModule: Gui thong bao khi bao gia duoc chap nhan
  */
 
 import { Module } from '@nestjs/common';
@@ -28,7 +31,11 @@ import { HopDongController } from './controllers/hop-dong.controller';
 import { BaoGiaService } from './services/bao-gia.service';
 import { HopDongService } from './services/hop-dong.service';
 
+// Modules
+import { NotificationModule } from '../notification';
+
 @Module({
+    imports: [NotificationModule],
     controllers: [
         BaoGiaController,
         HopDongController,

@@ -13,6 +13,9 @@
  * - tong_tien_truoc_thue = SUM(thanh_tien)
  * - tien_thue = tong_tien_truoc_thue * thue_vat / 100
  * - tong_tien_sau_thue = tong_tien_truoc_thue + tien_thue
+ * 
+ * Integration:
+ * - NotificationModule: Gui thong bao khi bao gia duoc chap nhan
  */
 
 import {
@@ -31,12 +34,16 @@ import {
     decimalToNumberBaoGia,
     TrangThaiBaoGia,
 } from '../dto/bao-gia.dto';
+import { ThongBaoService, LoaiThongBao, LoaiDoiTuong } from '../../notification';
 
 @Injectable()
 export class BaoGiaService {
     private readonly logger = new Logger(BaoGiaService.name);
 
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly thongBaoService: ThongBaoService,
+    ) { }
 
     /**
      * Include relations cho query
@@ -370,8 +377,32 @@ export class BaoGiaService {
             include: this.includeRelations,
         });
 
+        // Gửi thông báo khi báo giá được CHẤP NHẬN
+        if (newStatus === TrangThaiBaoGia.ACCEPTED && baoGia.nguoi_tao_id) {
+            await this.thongBaoService.createNotification(
+                {
+                    id_nguoi_nhan: baoGia.nguoi_tao_id,
+                    tieu_de: `Báo giá ${baoGia.ma_bao_gia} đã được khách hàng chấp nhận`,
+                    noi_dung: `Báo giá: ${baoGia.ma_bao_gia}\nTổng tiền: ${this.decimalToNumberSafe(baoGia.tong_tien_sau_thue).toLocaleString('vi-VN')} VND`,
+                    loai_thong_bao: LoaiThongBao.BAO_GIA_DUOC_CHAP_NHAN,
+                    id_doi_tuong_lien_quan: id,
+                    loai_doi_tuong: LoaiDoiTuong.BAO_GIA,
+                },
+                baoGia.id_doanh_nghiep,
+            );
+        }
+
         this.logger.log(`Cập nhật trạng thái báo giá ${baoGia.ma_bao_gia}: ${currentStatus} -> ${newStatus}`);
         return this.transformBaoGia(updated);
+    }
+
+    /**
+     * Helper: Chuyển đổi Decimal sang Number an toàn
+     */
+    private decimalToNumberSafe(value: any): number {
+        if (value === null || value === undefined) return 0;
+        if (typeof value === 'number') return value;
+        return typeof value.toNumber === 'function' ? value.toNumber() : Number(value);
     }
 
     /**
