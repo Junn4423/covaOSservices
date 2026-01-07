@@ -50,6 +50,7 @@ export enum LoaiPhieuKho {
  */
 export enum NguonNhap {
     NHA_CUNG_CAP = 'NHA_CUNG_CAP',
+    DON_HANG_NCC = 'DON_HANG_NCC', // Từ đơn đặt hàng NCC (PO)
     CHUYEN_KHO = 'CHUYEN_KHO',
     TRA_HANG = 'TRA_HANG',
     KHAC = 'KHAC',
