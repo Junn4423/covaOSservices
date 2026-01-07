@@ -4,7 +4,7 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 PHASE 6: Contract Management
+ *  PHASE 6: Contract Management
  *
  * Endpoints:
  * - POST   /hop-dong              -> Tạo hợp đồng thủ công

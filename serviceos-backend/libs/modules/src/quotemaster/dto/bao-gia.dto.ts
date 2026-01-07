@@ -4,7 +4,7 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 LƯU Ý QUAN TRỌNG VỀ DECIMAL:
+ *  LƯU Ý QUAN TRỌNG VỀ DECIMAL:
  * Prisma trả về Prisma.Decimal object, không phải number.
  * Để Frontend dễ xử lý, cần convert sang string/number.
  */

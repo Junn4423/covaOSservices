@@ -4,11 +4,11 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 XỬ LÝ DECIMAL:
+ *  XỬ LÝ DECIMAL:
  * Prisma trả về Prisma.Decimal object. Service này sẽ convert
  * sang number trước khi trả về cho Frontend.
  *
- * 📌 LOGIC TÍNH TOÁN TIỀN:
+ *  LOGIC TÍNH TOÁN TIỀN:
  * - thanh_tien (mỗi dòng) = so_luong * don_gia
  * - tong_tien_truoc_thue = SUM(thanh_tien)
  * - tien_thue = tong_tien_truoc_thue * thue_vat / 100
@@ -138,7 +138,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 CREATE - Tạo báo giá mới
+     *  CREATE - Tạo báo giá mới
      *
      * Flow:
      * 1. Validate khách hàng tồn tại
@@ -242,7 +242,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 FIND ALL - Danh sách báo giá với filter + phân trang
+     *  FIND ALL - Danh sách báo giá với filter + phân trang
      */
     async findAll(query: QueryBaoGiaDto) {
         const {
@@ -314,7 +314,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 FIND ONE - Chi tiết báo giá
+     *  FIND ONE - Chi tiết báo giá
      */
     async findOne(id: string) {
         const baoGia = await this.prisma.baoGia.findFirst({
@@ -330,7 +330,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 UPDATE STATUS - Cập nhật trạng thái báo giá
+     *  UPDATE STATUS - Cập nhật trạng thái báo giá
      *
      * Các transition hợp lệ:
      * - DRAFT -> SENT (Gửi cho khách)
@@ -375,7 +375,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 DELETE - Xóa mềm báo giá
+     *  DELETE - Xóa mềm báo giá
      * Chỉ cho phép xóa báo giá ở trạng thái DRAFT
      */
     async remove(id: string) {
@@ -397,7 +397,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 STATS - Thống kê theo trạng thái
+     *  STATS - Thống kê theo trạng thái
      */
     async getStatsByTrangThai() {
         const stats = await (this.prisma.baoGia.groupBy as any)({
@@ -414,7 +414,7 @@ export class BaoGiaService {
     }
 
     /**
-     * 📌 COUNT - Đếm tổng số báo giá
+     *  COUNT - Đếm tổng số báo giá
      */
     async count() {
         return this.prisma.baoGia.count({});

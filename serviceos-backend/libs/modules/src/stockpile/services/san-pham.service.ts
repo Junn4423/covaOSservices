@@ -4,7 +4,7 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 XỬ LÝ DECIMAL:
+ *  XỬ LÝ DECIMAL:
  * Prisma trả về Prisma.Decimal object. Service này sẽ convert
  * sang number trước khi trả về cho Frontend.
  */

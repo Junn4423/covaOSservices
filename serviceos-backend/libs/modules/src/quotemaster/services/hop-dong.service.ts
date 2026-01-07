@@ -4,7 +4,7 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 PHASE 6: Contract Management
+ *  PHASE 6: Contract Management
  *
  * Features:
  * 1. create(): Tạo hợp đồng thủ công
@@ -16,7 +16,7 @@
  * 7. remove(): Soft delete
  * 8. findExpiring(): Lấy danh sách sắp hết hạn
  *
- * 📌 XỬ LÝ DECIMAL:
+ *  XỬ LÝ DECIMAL:
  * - Prisma trả về Prisma.Decimal, cần convert sang number cho response
  * - Sử dụng helper function decimalToNumberHopDong()
  */
@@ -111,7 +111,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 CREATE - Tạo hợp đồng thủ công
+     *  CREATE - Tạo hợp đồng thủ công
      *
      * Flow:
      * 1. Validate khách hàng tồn tại
@@ -161,7 +161,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 CREATE FROM QUOTE - Convert báo giá thành hợp đồng
+     *  CREATE FROM QUOTE - Convert báo giá thành hợp đồng
      *
      *  Đây là tính năng CORE của Phase 6!
      *
@@ -269,7 +269,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 FIND ALL - Danh sách hợp đồng với filter + phân trang
+     *  FIND ALL - Danh sách hợp đồng với filter + phân trang
      *
      * Filters:
      * - trang_thai: Lọc theo trạng thái
@@ -346,7 +346,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 FIND ONE - Lấy chi tiết một hợp đồng
+     *  FIND ONE - Lấy chi tiết một hợp đồng
      */
     async findOne(id: string) {
         const hopDong = await this.prisma.hopDong.findFirst({
@@ -369,7 +369,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 FIND EXPIRING - Lấy danh sách hợp đồng sắp hết hạn
+     *  FIND EXPIRING - Lấy danh sách hợp đồng sắp hết hạn
      *
      * Dùng cho Dashboard để hiển thị cảnh báo
      * Mặc định: 30 ngày tới
@@ -405,7 +405,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 UPDATE - Cập nhật thông tin hợp đồng
+     *  UPDATE - Cập nhật thông tin hợp đồng
      *
      * Cho phép cập nhật:
      * - ten_hop_dong
@@ -450,7 +450,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 UPDATE STATUS - Cập nhật trạng thái hợp đồng
+     *  UPDATE STATUS - Cập nhật trạng thái hợp đồng
      *
      * Các transition hợp lệ:
      * - DRAFT -> ACTIVE (Kích hoạt hợp đồng)
@@ -506,7 +506,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 REMOVE - Xóa mềm hợp đồng
+     *  REMOVE - Xóa mềm hợp đồng
      *
      * Chỉ cho phép xóa hợp đồng ở trạng thái DRAFT
      */
@@ -549,7 +549,7 @@ export class HopDongService {
     // ============================================================
 
     /**
-     * 📌 STATS - Thống kê hợp đồng theo trạng thái
+     *  STATS - Thống kê hợp đồng theo trạng thái
      */
     async getStats() {
         const [stats, totalValue, expiringCount] = await Promise.all([
