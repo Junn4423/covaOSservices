@@ -21,11 +21,13 @@ export interface KetQuaTest {
     tenTest: string;
     endpoint: string;
     method: string;
-    thanhCong: boolean;
-    thoiGianMs: number;
+    thanhCong?: boolean;
+    thoiGianMs?: number;
     statusCode?: number;
     loiChiTiet?: string;
     loaiLoi?: 'VALIDATION' | 'BUSINESS_LOGIC' | 'SERVER_ERROR' | 'TIMEOUT' | 'UNAUTHORIZED';
+    trangThai?: string;
+    moTa?: string;
 }
 
 export interface CanhBao {
@@ -64,16 +66,18 @@ export class TestReporter {
     // GHI NHẬN KẾT QUẢ TEST
     // ============================================================
     ghiNhanKetQua(ketQua: KetQuaTest): void {
+        const thanhCong = ketQua.thanhCong ?? true;
+        const thoiGianMs = ketQua.thoiGianMs ?? 0;
+
         this.ketQuaTests.push({
             ...ketQua,
-            thoiGianMs: ketQua.thoiGianMs || 0,
+            thanhCong,
+            thoiGianMs,
         });
 
         // Log realtime
-        const icon = ketQua.thanhCong ? '' : '';
-        console.log(
-            `${icon} [${ketQua.method}] ${ketQua.endpoint} - ${ketQua.tenTest} (${ketQua.thoiGianMs}ms)`
-        );
+        const icon = thanhCong ? '' : '';
+        console.log(`${icon} [${ketQua.method}] ${ketQua.endpoint} - ${ketQua.tenTest} (${thoiGianMs}ms)`);
     }
 
     // ============================================================

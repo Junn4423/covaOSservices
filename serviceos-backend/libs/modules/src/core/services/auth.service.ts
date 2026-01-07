@@ -5,22 +5,12 @@
  * ============================================================
  */
 
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@libs/database';
+import { HanhDong } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-
-export interface LoginDto {
-    email: string;
-    password: string;
-}
-
-export interface RegisterDto {
-    email: string;
-    password: string;
-    ho_ten: string;
-    ten_doanh_nghiep?: string;
-}
+import { LoginRequestDto, RefreshTokenDto, RegisterTenantDto } from '../dto';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +19,13 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) { }
 
-    async login(dto: LoginDto) {
+    async login(dto: LoginRequestDto) {
+        const providedPassword = dto.password ?? dto.mat_khau;
+
+        if (!providedPassword) {
+            throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
+        }
+
         // Tìm user theo email (bypass tenant filter vì chưa login)
         const user = await this.prisma.runAsSystem(async () => {
             return this.prisma.nguoiDung.findFirst({
@@ -52,7 +48,7 @@ export class AuthService {
         }
 
         // Verify password
-        const isPasswordValid = await bcrypt.compare(dto.password, user.mat_khau);
+        const isPasswordValid = await bcrypt.compare(providedPassword, user.mat_khau);
         if (!isPasswordValid) {
             throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
         }
@@ -85,6 +81,19 @@ export class AuthService {
                 where: { id: user.id },
                 data: { lan_dang_nhap_cuoi: new Date() },
             });
+
+            // Ghi audit log cho hành động đăng nhập
+            await this.prisma.nhatKyHoatDong.create({
+                data: {
+                    id_doanh_nghiep: user.id_doanh_nghiep,
+                    nguoi_thuc_hien_id: user.id,
+                    hanh_dong: HanhDong.LOGIN,
+                    doi_tuong: 'NguoiDung',
+                    id_doi_tuong: user.id,
+                    mo_ta: 'Đăng nhập hệ thống',
+                    endpoint: '/auth/login',
+                },
+            });
         });
 
         return {
@@ -99,6 +108,144 @@ export class AuthService {
                 doanh_nghiep: user.doanh_nghiep,
             },
         };
+    }
+
+    async registerTenant(dto: RegisterTenantDto) {
+        const shouldCreateAdmin = !!dto.admin_email;
+
+        if (shouldCreateAdmin) {
+            if (!dto.mat_khau) {
+                throw new BadRequestException('Mật khẩu admin là bắt buộc');
+            }
+
+            if (!dto.admin_ho_ten) {
+                throw new BadRequestException('Họ tên admin là bắt buộc');
+            }
+        }
+
+        try {
+            const result = await this.prisma.runAsSystem(async () => {
+                return this.prisma.$transaction(async (tx) => {
+                    const tenant = await tx.doanhNghiep.create({
+                        data: {
+                            ten_doanh_nghiep: dto.ten_doanh_nghiep,
+                            ma_doanh_nghiep: dto.ma_doanh_nghiep,
+                            email: dto.email,
+                            so_dien_thoai: dto.so_dien_thoai,
+                            dia_chi: dto.dia_chi,
+                            goi_cuoc: (dto.goi_cuoc as any) || 'trial',
+                            trang_thai: 1,
+                        },
+                    });
+
+                    let adminUser: any = null;
+
+                    if (shouldCreateAdmin && dto.admin_email && dto.mat_khau && dto.admin_ho_ten) {
+                        const hashedPassword = await bcrypt.hash(dto.mat_khau, 10);
+
+                        adminUser = await tx.nguoiDung.upsert({
+                            where: {
+                                id_doanh_nghiep_email: {
+                                    id_doanh_nghiep: tenant.id,
+                                    email: dto.admin_email,
+                                },
+                            },
+                            update: {
+                                mat_khau: hashedPassword,
+                                ho_ten: dto.admin_ho_ten,
+                                vai_tro: 'admin',
+                                trang_thai: 1,
+                            },
+                            create: {
+                                id_doanh_nghiep: tenant.id,
+                                email: dto.admin_email,
+                                mat_khau: hashedPassword,
+                                ho_ten: dto.admin_ho_ten,
+                                vai_tro: 'admin',
+                                trang_thai: 1,
+                            },
+                        });
+                    }
+
+                    return { tenant, adminUser };
+                });
+            });
+
+            let tokenBundle: any = {};
+
+            if (result.adminUser) {
+                const payload = {
+                    sub: result.adminUser.id,
+                    email: result.adminUser.email,
+                    tenantId: result.tenant.id,
+                    role: result.adminUser.vai_tro,
+                    ho_ten: result.adminUser.ho_ten,
+                };
+
+                tokenBundle = {
+                    access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
+                    refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+                    expires_in: 900,
+                };
+
+                await this.prisma.runAsSystem(async () => {
+                    await this.prisma.nhatKyHoatDong.create({
+                        data: {
+                            id_doanh_nghiep: result.tenant.id,
+                            nguoi_thuc_hien_id: result.adminUser.id,
+                            hanh_dong: HanhDong.REGISTER,
+                            doi_tuong: 'DoanhNghiep',
+                            id_doi_tuong: result.tenant.id,
+                            mo_ta: 'Đăng ký tenant mới',
+                            endpoint: '/auth/register-tenant',
+                        },
+                    });
+                });
+            }
+
+            return {
+                id: result.tenant.id,
+                tenant: result.tenant,
+                admin: result.adminUser
+                    ? {
+                        id: result.adminUser.id,
+                        email: result.adminUser.email,
+                        ho_ten: result.adminUser.ho_ten,
+                    }
+                    : undefined,
+                ...tokenBundle,
+            };
+        } catch (error) {
+            if (error.code === 'P2002') {
+                throw new ConflictException('Tenant hoặc email đã tồn tại');
+            }
+            throw error;
+        }
+    }
+
+    async refreshToken(dto: RefreshTokenDto) {
+        try {
+            const payload = this.jwtService.verify(dto.refresh_token);
+
+            const newPayload = {
+                sub: payload.sub,
+                email: payload.email,
+                tenantId: payload.tenantId,
+                role: payload.role,
+                ho_ten: payload.ho_ten,
+            };
+
+            const accessToken = this.jwtService.sign(newPayload, { expiresIn: '15m' });
+            const refreshToken = this.jwtService.sign(newPayload, { expiresIn: '7d' });
+
+            return {
+                access_token: accessToken,
+                refresh_token: refreshToken,
+                expires_in: 900,
+            };
+        } catch (error) {
+            throw new UnauthorizedException('Refresh token không hợp lệ');
+        }
     }
 
     async getProfile(userId: string) {

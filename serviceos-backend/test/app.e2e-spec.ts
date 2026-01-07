@@ -229,8 +229,21 @@ describe('ServiceOS E2E Test Suite - Master Orchestrator', () => {
                 const bcrypt = require('bcrypt');
                 const hashedPassword = await bcrypt.hash(TestConfig.ADMIN_USER.mat_khau, 10);
 
-                const admin = await prisma.nguoiDung.create({
-                    data: {
+                const admin = await prisma.nguoiDung.upsert({
+                    where: {
+                        id_doanh_nghiep_email: {
+                            id_doanh_nghiep: testData.tenantA.id,
+                            email: TestConfig.ADMIN_USER.email,
+                        },
+                    },
+                    update: {
+                        mat_khau: hashedPassword,
+                        ho_ten: 'Admin Tenant A',
+                        vai_tro: 'admin',
+                        so_dien_thoai: DataGenerator.generatePhone(),
+                        trang_thai: 1,
+                    },
+                    create: {
                         id_doanh_nghiep: testData.tenantA.id,
                         email: TestConfig.ADMIN_USER.email,
                         mat_khau: hashedPassword,
@@ -238,7 +251,7 @@ describe('ServiceOS E2E Test Suite - Master Orchestrator', () => {
                         vai_tro: 'admin',
                         so_dien_thoai: DataGenerator.generatePhone(),
                         trang_thai: 1,
-                    }
+                    },
                 });
 
                 testData.adminUser = admin;

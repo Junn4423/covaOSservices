@@ -12,3 +12,5 @@ export * from './procurepool';
 export * from './notification';
 export * from './billing';
 export * from './analytics';
+export * from './storage';
+export * from './realtime';

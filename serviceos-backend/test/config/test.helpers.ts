@@ -473,7 +473,20 @@ export async function ensureTenantExists(): Promise<void> {
         }
         
         testData.tenantA.adminId = adminA.id;
-        testData.tenantA.accessToken = 'mock_token_for_testing'; // Mock token cho test
+        // Tạo access token hợp lệ cho admin Tenant A
+        const jwt = require('jsonwebtoken');
+        const jwtSecret = process.env.JWT_SECRET || 'serviceos-secret-key';
+        testData.tenantA.accessToken = jwt.sign(
+            {
+                sub: adminA.id,
+                email: adminA.email,
+                tenantId: tenantA.id,
+                role: adminA.vai_tro,
+                ho_ten: adminA.ho_ten,
+            },
+            jwtSecret,
+            { expiresIn: '15m' },
+        );
     }
     
     // Kiểm tra và tạo Tenant B nếu chưa có

@@ -911,6 +911,36 @@ model ChiTietDonDatHang {
 }
 
 // ============================================================
+// PHẦN 10B: LƯU TRỮ TẬP TIN (FILE STORAGE)
+// ============================================================
+
+model TapTin {
+  id                String    @id @default(uuid()) @db.Char(36)
+  id_doanh_nghiep   String    @db.Char(36)
+  nguoi_tao_id      String?   @db.Char(36)
+  
+  ten_goc           String    @db.VarChar(255)    // Original filename
+  ten_luu_tru       String    @db.VarChar(255)    // Stored filename (UUID based)
+  loai_tap_tin      String    @db.VarChar(100)    // MIME type
+  kich_thuoc        Int       @db.Int             // File size in bytes
+  bucket            String    @db.VarChar(100)    // Storage bucket
+  duong_dan         String    @db.VarChar(500)    // Storage key/path
+  url_cong_khai     String?   @db.VarChar(500)    // Public URL if available
+  
+  // Optional: Link to specific entity
+  loai_doi_tuong    String?   @db.VarChar(50)     // Entity type: AVATAR, CONTRACT, etc.
+  id_doi_tuong      String?   @db.Char(36)        // Entity ID
+  
+  ngay_tao          DateTime  @default(now())
+  ngay_cap_nhat     DateTime  @updatedAt
+  ngay_xoa          DateTime?
+
+  @@index([id_doanh_nghiep])
+  @@index([loai_doi_tuong, id_doi_tuong])
+  @@map("tap_tin")
+}
+
+// ============================================================
 // PHẦN 11: HỆ THỐNG THÔNG BÁO (NOTIFICATION)
 // ============================================================
 

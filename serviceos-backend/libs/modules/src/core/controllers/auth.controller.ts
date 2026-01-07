@@ -21,13 +21,24 @@ import {
     ApiBearerAuth,
     ApiBody,
 } from '@nestjs/swagger';
-import { AuthService, LoginDto } from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
+import { LoginRequestDto, RefreshTokenDto, RegisterTenantDto } from '../dto';
 import { JwtAuthGuard, Public, ActiveUser } from '@libs/common';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
+
+    @Post('register-tenant')
+    @Public()
+    @HttpCode(HttpStatus.CREATED)
+    @ApiOperation({ summary: 'Đăng ký tenant mới cùng admin' })
+    @ApiResponse({ status: HttpStatus.CREATED, description: 'Tạo tenant thành công' })
+    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Tenant đã tồn tại' })
+    async registerTenant(@Body() dto: RegisterTenantDto) {
+        return this.authService.registerTenant(dto);
+    }
 
     @Post('login')
     @Public()
@@ -65,8 +76,17 @@ export class AuthController {
         },
     })
     @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Thông tin đăng nhập không đúng' })
-    async login(@Body() dto: LoginDto) {
+    async login(@Body() dto: LoginRequestDto) {
         return this.authService.login(dto);
+    }
+
+    @Post('refresh')
+    @Public()
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Lấy access token mới bằng refresh token' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Refresh token hợp lệ' })
+    async refresh(@Body() dto: RefreshTokenDto) {
+        return this.authService.refreshToken(dto);
     }
 
     @Get('profile')

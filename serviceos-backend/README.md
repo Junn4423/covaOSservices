@@ -7,8 +7,8 @@
 ```
 serviceos-backend/
 ├── src/                          # API Gateway Application
-│   ├── main.ts                   # Bootstrap với Swagger
-│   └── app.module.ts             # Main module - import 12 modules
+│   ├── main.ts                   # Bootstrap với Swagger + WebSocket
+│   └── app.module.ts             # Main module - import all modules
 │
 ├── libs/
 │   ├── database/                 # Database Library
@@ -24,7 +24,7 @@ serviceos-backend/
 │   │       ├── filters/          # AllExceptionsFilter
 │   │       └── strategies/       # JwtStrategy
 │   │
-│   └── modules/                  # 12 Business Modules
+│   └── modules/                  # Business Modules (Phases 1-16)
 │       ├── core/                 # Auth, User, Tenant
 │       ├── techmate/             # Jobs, Assignments, Customers
 │       ├── stockpile/            # Inventory, Products
@@ -36,10 +36,13 @@ serviceos-backend/
 │       ├── customerportal/       # Customer Portal
 │       ├── procurepool/          # Suppliers, PO
 │       ├── notification/         # Notifications
-│       └── billing/              # SaaS Billing
+│       ├── billing/              # SaaS Billing
+│       ├── analytics/            # Dashboard Analytics
+│       ├── storage/              # Phase 16: MinIO/S3 File Storage
+│       └── realtime/             # Phase 16: WebSocket Gateway
 │
 ├── prisma/
-│   └── schema.prisma             # 28 Models với Vietnamese naming
+│   └── schema.prisma             # Database models (Vietnamese naming)
 │
 └── package.json
 ```
@@ -48,34 +51,37 @@ serviceos-backend/
 
 ### Multi-tenant Architecture
 
-#### Cách hoạt động:
+#### Cach hoat dong:
 
-1. **JWT Token** chứa `tenantId` (id_doanh_nghiep)
-2. **JwtAuthGuard** extract và lưu vào **CLS (Continuation Local Storage)**
-3. **PrismaService Middleware** tự động inject:
-   - `WHERE id_doanh_nghiep = tenantId` vào mọi query READ
-   - `SET id_doanh_nghiep = tenantId` vào mọi query CREATE
-   - Convert DELETE thành soft delete (set `ngay_xoa`)
+1. **JWT Token** chua `tenantId` (id_doanh_nghiep)
+2. **JwtAuthGuard** extract va luu vao **CLS (Continuation Local Storage)**
+3. **PrismaService Middleware** tu dong inject:
+   - `WHERE id_doanh_nghiep = tenantId` vao moi query READ
+   - `SET id_doanh_nghiep = tenantId` vao moi query CREATE
+   - Convert DELETE thanh soft delete (set `ngay_xoa`)
 
 ---
 
 ### Quick Start
 
 ```bash
-# 1. Cài dependencies
+# 1. Install dependencies
 npm install
 
-# 2. Cấu hình database
+# 2. Configure environment
 cp .env.example .env
-# Sửa DATABASE_URL trong .env
+# Edit DATABASE_URL in .env
 
 # 3. Generate Prisma Client
 npm run db:generate
 
-# 4. Push schema lên MySQL (DEV)
+# 4. Push schema to MySQL (DEV)
 npm run db:push
 
-# 5. Chạy dev server
+# 5. (Optional) Seed demo data
+npm run db:seed
+
+# 6. Start development server
 npm run start:dev
 ```
 
@@ -83,13 +89,51 @@ npm run start:dev
 
 ### API Documentation
 
-Sau khi chạy server, truy cập:
+After starting the server:
 - **Swagger UI**: http://localhost:3001/docs
 - **API Base**: http://localhost:3001/api/v1
+- **WebSocket**: ws://localhost:3001
 
 ---
 
-### 🏗️ Tech Stack
+### Phase 16: Infrastructure Features
+
+#### File Storage (MinIO/S3)
+
+```bash
+# Configure in .env:
+STORAGE_ENDPOINT=http://localhost:9000
+STORAGE_BUCKET=serviceos
+STORAGE_ACCESS_KEY=minioadmin
+STORAGE_SECRET_KEY=minioadmin
+```
+
+**Endpoints:**
+- `POST /storage/upload` - Upload any file
+- `POST /storage/upload/image` - Upload image (5MB max)
+- `POST /storage/upload/document` - Upload PDF/Word/Excel (20MB max)
+- `GET /storage` - List files
+- `DELETE /storage/:fileId` - Delete file
+
+#### Real-time WebSocket
+
+**Connection:**
+```javascript
+const socket = io('http://localhost:3001', {
+  auth: { token: 'your-jwt-token' }
+});
+```
+
+**Events:**
+- `connected` - Authentication successful
+- `notification` - New notification received
+- `notification:count` - Unread count update
+- `alert` - System alert
+- `broadcast` - Tenant-wide broadcast
+
+---
+
+### Tech Stack
 
 - **Framework**: NestJS 10
 - **ORM**: Prisma 5
@@ -97,3 +141,11 @@ Sau khi chạy server, truy cập:
 - **Auth**: JWT + Passport
 - **Docs**: Swagger/OpenAPI
 - **Context**: nestjs-cls (Request-scoped tenant)
+- **Storage**: AWS S3 SDK (MinIO compatible)
+- **Real-time**: Socket.io
+
+---
+
+### Frontend Portal
+
+See `apps/portal/README.md` for the Next.js frontend application.
