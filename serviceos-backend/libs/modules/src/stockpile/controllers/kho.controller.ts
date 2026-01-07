@@ -4,7 +4,7 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 WAREHOUSE MANAGEMENT API:
+ *  WAREHOUSE MANAGEMENT API:
  * - CRUD cơ bản cho kho
  * - Soft delete support
  * - Multi-tenant support

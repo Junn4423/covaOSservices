@@ -244,7 +244,7 @@ export class TonKhoService {
 
         const tongSoLuong = items.reduce((sum, item) => sum + item.so_luong, 0);
         this.logger.log(
-            `📦 Nhập kho: ${maPhieu} - ${items.length} SP - Tổng: ${tongSoLuong} đơn vị (DN: ${idDoanhNghiep})`,
+            ` Nhập kho: ${maPhieu} - ${items.length} SP - Tổng: ${tongSoLuong} đơn vị (DN: ${idDoanhNghiep})`,
         );
 
         return {

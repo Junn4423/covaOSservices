@@ -6,7 +6,7 @@
  *
  * Service xử lý nghiệp vụ quản lý khách hàng.
  *
- * 🔒 MULTI-TENANT SECURITY:
+ * MULTI-TENANT SECURITY:
  * - KHÔNG cần viết `where: { id_doanh_nghiep }` thủ công
  * - CLS Middleware trong PrismaService tự động inject tenant filter
  * - Mọi query đều được filter theo tenant của user hiện tại

@@ -369,7 +369,7 @@ export class PhieuThuChiService {
         const tonQuy = tongThu - tongChi;
 
         this.logger.log(
-            `📊 Stats [${tuNgay.toISOString().split('T')[0]} - ${denNgay.toISOString().split('T')[0]}]: Thu ${tongThu.toLocaleString('vi-VN')} | Chi ${tongChi.toLocaleString('vi-VN')} | Tồn ${tonQuy.toLocaleString('vi-VN')}`,
+            ` Stats [${tuNgay.toISOString().split('T')[0]} - ${denNgay.toISOString().split('T')[0]}]: Thu ${tongThu.toLocaleString('vi-VN')} | Chi ${tongChi.toLocaleString('vi-VN')} | Tồn ${tonQuy.toLocaleString('vi-VN')}`,
         );
 
         return {

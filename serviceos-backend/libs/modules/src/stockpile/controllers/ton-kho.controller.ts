@@ -4,14 +4,14 @@
  * ServiceOS - SaaS Backend
  * ============================================================
  *
- * 📌 INVENTORY MANAGEMENT API:
+ *  INVENTORY MANAGEMENT API:
  * - Nhập kho (Import Stock)
  * - Xuất kho (Export Stock)
  * - Chuyển kho (Transfer Stock)
  * - Xem tồn kho (Inventory List)
  * - Thẻ kho (Stock Card / Audit Trail)
  *
- * 📌 INTEGRATION:
+ *  INTEGRATION:
  * API xuatKho được thiết kế để TechMate có thể gọi
  * khi nhân viên báo cáo sử dụng vật tư cho công việc.
  *

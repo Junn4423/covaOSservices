@@ -1,9 +1,46 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "..",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testRegex": "test/.*\\.e2e-spec\\.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
-  }
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": "<rootDir>/tsconfig.json"
+      }
+    ]
+  },
+  "testTimeout": 60000,
+  "verbose": true,
+  "detectOpenHandles": true,
+  "forceExit": true,
+  "moduleNameMapper": {
+    "@libs/database/(.*)": "<rootDir>/libs/database/src/$1",
+    "@libs/database": "<rootDir>/libs/database/src",
+    "@libs/common/(.*)": "<rootDir>/libs/common/src/$1",
+    "@libs/common": "<rootDir>/libs/common/src",
+    "@libs/modules/(.*)": "<rootDir>/libs/modules/src/$1",
+    "@libs/modules": "<rootDir>/libs/modules/src",
+    "^@app/(.*)$": "<rootDir>/src/$1"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/test/config/test.config.ts"],
+  "collectCoverageFrom": [
+    "src/**/*.{js,jsx,ts,tsx}",
+    "libs/**/*.{js,jsx,ts,tsx}",
+    "!**/*.module.ts",
+    "!**/*.dto.ts",
+    "!**/*.entity.ts",
+    "!**/index.ts",
+    "!**/node_modules/**",
+    "!**/dist/**",
+    "!**/test/**",
+    "!src/main.ts"
+  ],
+  "coverageDirectory": "./coverage-e2e",
+  "coverageReporters": ["text", "lcov", "html"],
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/"
+  ]
 }

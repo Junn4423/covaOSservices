@@ -45,7 +45,7 @@ export TOKEN="your_access_token_here"
 
 ---
 
-## 📦 Nhóm Sản Phẩm (Product Categories)
+##  Nhóm Sản Phẩm (Product Categories)
 
 ### 1. Tạo nhóm mới
 ```bash

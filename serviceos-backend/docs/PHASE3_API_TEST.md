@@ -227,7 +227,7 @@ curl -X GET "http://localhost:3000/api/v1/khach-hang/count" \
 
 ---
 
-## 🔒 Multi-tenant Notes
+## Multi-tenant Notes
 
 - Tất cả API tự động filter theo `id_doanh_nghiep` của user đang đăng nhập
 - Không thể truy cập dữ liệu của tenant khác

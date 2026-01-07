@@ -248,7 +248,7 @@ Authorization: Bearer {token}
 }
 ```
 
-**⚠️ Validation:** Kiểm tra tồn kho trước khi xuất
+** Validation:** Kiểm tra tồn kho trước khi xuất
 
 **Response 400 (không đủ tồn kho):**
 ```json

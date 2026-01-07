@@ -488,7 +488,7 @@ export class DonDatHangService {
         });
 
         this.logger.log(
-            `✅ Xác nhận PO: ${don.ma_don_hang} -> ORDERED (DN: ${idDoanhNghiep})`,
+            ` Xác nhận PO: ${don.ma_don_hang} -> ORDERED (DN: ${idDoanhNghiep})`,
         );
 
         return this.findOne(idDoanhNghiep, id);
@@ -618,7 +618,7 @@ export class DonDatHangService {
         });
 
         this.logger.log(
-            `📦 Nhận hàng PO: ${don.ma_don_hang} -> Kho: ${kho.ten_kho} (DN: ${idDoanhNghiep})`,
+            ` Nhận hàng PO: ${don.ma_don_hang} -> Kho: ${kho.ten_kho} (DN: ${idDoanhNghiep})`,
         );
 
         return {
@@ -675,7 +675,7 @@ export class DonDatHangService {
         });
 
         this.logger.log(
-            `❌ Hủy PO: ${don.ma_don_hang} - Lý do: ${dto.ly_do_huy} (DN: ${idDoanhNghiep})`,
+            ` Hủy PO: ${don.ma_don_hang} - Lý do: ${dto.ly_do_huy} (DN: ${idDoanhNghiep})`,
         );
 
         return this.findOne(idDoanhNghiep, id);
