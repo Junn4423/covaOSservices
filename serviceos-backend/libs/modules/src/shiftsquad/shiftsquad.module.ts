@@ -6,7 +6,7 @@
  *
  * Module nay quan ly:
  * - Ca Lam Viec (CaLamViec) - Work Shift Management
- * - Cham Cong (ChamCong) - Employee Timekeeping / Attendance
+ * - Chấm Công (ChamCong) - Employee Timekeeping / Attendance
  *
  * Phase 11: ShiftSquad - HR & Timekeeping
  *

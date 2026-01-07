@@ -32,43 +32,43 @@ import { Transform, Type } from 'class-transformer';
  */
 export class AssignAssetDto {
     @ApiProperty({
-        description: 'Asset ID to assign',
+        description: 'ID tài sản cần phân công',
         example: '550e8400-e29b-41d4-a716-446655440000',
     })
-    @IsNotEmpty({ message: 'ID tai san khong duoc de trong' })
-    @IsUUID('4', { message: 'ID tai san phai la UUID hop le' })
+    @IsNotEmpty({ message: 'ID tài sản không được để trống' })
+    @IsUUID('4', { message: 'ID tài sản phải là UUID hợp lệ' })
     tai_san_id: string;
 
     @ApiProperty({
-        description: 'User ID to assign to',
+        description: 'ID người dùng cần phân công cho',
         example: '550e8400-e29b-41d4-a716-446655440000',
     })
-    @IsNotEmpty({ message: 'ID nguoi dung khong duoc de trong' })
-    @IsUUID('4', { message: 'ID nguoi dung phai la UUID hop le' })
+    @IsNotEmpty({ message: 'ID người dùng không được để trống' })
+    @IsUUID('4', { message: 'ID người dùng phải là UUID hợp lệ' })
     nguoi_dung_id: string;
 
     @ApiPropertyOptional({
-        description: 'Borrow date (YYYY-MM-DD). Defaults to today.',
+        description: 'Ngày mượn (YYYY-MM-DD). Mặc định là hôm nay.',
         example: '2026-01-07',
     })
     @IsOptional()
-    @IsDateString({}, { message: 'Ngay muon phai theo dinh dang YYYY-MM-DD' })
+    @IsDateString({}, { message: 'Ngày mượn phải theo định dạng YYYY-MM-DD' })
     ngay_muon?: string;
 
     @ApiPropertyOptional({
-        description: 'Expected return date (YYYY-MM-DD)',
+        description: 'Ngày trả dự kiến (YYYY-MM-DD)',
         example: '2026-01-14',
     })
     @IsOptional()
-    @IsDateString({}, { message: 'Ngay tra du kien phai theo dinh dang YYYY-MM-DD' })
+    @IsDateString({}, { message: 'Ngày trả dự kiến phải theo định dạng YYYY-MM-DD' })
     ngay_tra_du_kien?: string;
 
     @ApiPropertyOptional({
-        description: 'Notes about the assignment',
-        example: 'Cho muon de lam du an ABC',
+        description: 'Ghi chú về việc phân công',
+        example: 'Cho mượn để làm dự án ABC',
     })
     @IsOptional()
-    @IsString({ message: 'Ghi chu phai la chuoi' })
+    @IsString({ message: 'Ghi chú phải là chuỗi' })
     ghi_chu?: string;
 }
 
@@ -81,29 +81,29 @@ export class AssignAssetDto {
  */
 export class ReturnAssetDto {
     @ApiProperty({
-        description: 'Asset ID to return',
+        description: 'ID tài sản cần trả lại',
         example: '550e8400-e29b-41d4-a716-446655440000',
     })
-    @IsNotEmpty({ message: 'ID tai san khong duoc de trong' })
-    @IsUUID('4', { message: 'ID tai san phai la UUID hop le' })
+    @IsNotEmpty({ message: 'ID tài sản không được để trống' })
+    @IsUUID('4', { message: 'ID tài sản phải là UUID hợp lệ' })
     tai_san_id: string;
 
     @ApiPropertyOptional({
-        description: 'Condition when returned',
-        example: 'Binh thuong, khong hu hong',
+        description: 'Tình trạng khi trả lại',
+        example: 'Bình thường, không hư hỏng',
         maxLength: 255,
     })
     @IsOptional()
-    @IsString({ message: 'Tinh trang khi tra phai la chuoi' })
-    @MaxLength(255, { message: 'Tinh trang khi tra toi da 255 ky tu' })
+    @IsString({ message: 'Tình trạng khi trả phải là chuỗi' })
+    @MaxLength(255, { message: 'Tình trạng khi trả tối đa 255 ký tự' })
     @Transform(({ value }) => value?.trim())
     tinh_trang_khi_tra?: string;
 
     @ApiPropertyOptional({
-        description: 'Notes',
+        description: 'Ghi chú',
     })
     @IsOptional()
-    @IsString({ message: 'Ghi chu phai la chuoi' })
+    @IsString({ message: 'Ghi chú phải là chuỗi' })
     ghi_chu?: string;
 }
 
@@ -116,7 +116,7 @@ export class ReturnAssetDto {
  */
 export class QueryNhatKySuDungDto {
     @ApiPropertyOptional({
-        description: 'Page number',
+        description: 'Số trang',
         default: 1,
         minimum: 1,
     })
@@ -127,7 +127,7 @@ export class QueryNhatKySuDungDto {
     page?: number = 1;
 
     @ApiPropertyOptional({
-        description: 'Items per page',
+        description: 'Số items mỗi trang',
         default: 20,
         minimum: 1,
         maximum: 100,
@@ -139,21 +139,21 @@ export class QueryNhatKySuDungDto {
     limit?: number = 20;
 
     @ApiPropertyOptional({
-        description: 'Filter by asset ID',
+        description: 'Lọc theo ID tài sản',
     })
     @IsOptional()
-    @IsUUID('4', { message: 'ID tai san phai la UUID hop le' })
+    @IsUUID('4', { message: 'ID tài sản phải là UUID hợp lệ' })
     tai_san_id?: string;
 
     @ApiPropertyOptional({
-        description: 'Filter by user ID (borrower)',
+        description: 'Lọc theo ID người mượn',
     })
     @IsOptional()
-    @IsUUID('4', { message: 'ID nguoi muon phai la UUID hop le' })
+    @IsUUID('4', { message: 'ID người mượn phải là UUID hợp lệ' })
     nguoi_muon_id?: string;
 
     @ApiPropertyOptional({
-        description: 'Filter active loans only (not yet returned)',
+        description: 'Chỉ lọc các khoản mượn đang hoạt động (chưa trả lại)',
         default: false,
     })
     @IsOptional()
@@ -195,7 +195,7 @@ export class NguoiMuonEmbeddedDto {
     @ApiPropertyOptional({ example: 'nguyenvana@email.com' })
     email?: string;
 
-    @ApiPropertyOptional({ example: 'Phong Ky Thuat' })
+    @ApiPropertyOptional({ example: 'Phòng Kỹ Thuật' })
     phong_ban?: string;
 }
 
@@ -203,40 +203,40 @@ export class NguoiMuonEmbeddedDto {
  * Response DTO for usage log
  */
 export class NhatKySuDungResponseDto {
-    @ApiProperty({ description: 'Log ID (UUID)' })
+    @ApiProperty({ description: 'ID nhật ký (UUID)' })
     id: string;
 
-    @ApiProperty({ description: 'Asset ID' })
+    @ApiProperty({ description: 'ID tài sản' })
     id_tai_san: string;
 
-    @ApiProperty({ description: 'Borrower ID' })
+    @ApiProperty({ description: 'ID người mượn' })
     id_nguoi_muon: string;
 
-    @ApiProperty({ description: 'Borrow date' })
+    @ApiProperty({ description: 'Ngày mượn' })
     ngay_muon: Date;
 
-    @ApiPropertyOptional({ description: 'Expected return date' })
+    @ApiPropertyOptional({ description: 'Ngày trả dự kiến' })
     ngay_tra_du_kien?: Date;
 
-    @ApiPropertyOptional({ description: 'Actual return date' })
+    @ApiPropertyOptional({ description: 'Ngày trả thực tế' })
     ngay_tra_thuc_te?: Date;
 
-    @ApiPropertyOptional({ description: 'Condition when returned' })
+    @ApiPropertyOptional({ description: 'Tình trạng khi trả lại' })
     tinh_trang_khi_tra?: string;
 
-    @ApiPropertyOptional({ description: 'Notes' })
+    @ApiPropertyOptional({ description: 'Ghi chú' })
     ghi_chu?: string;
 
-    @ApiPropertyOptional({ description: 'Asset info', type: TaiSanEmbeddedDto })
+    @ApiPropertyOptional({ description: 'Thông tin tài sản', type: TaiSanEmbeddedDto })
     tai_san?: TaiSanEmbeddedDto;
 
-    @ApiPropertyOptional({ description: 'Borrower info', type: NguoiMuonEmbeddedDto })
+    @ApiPropertyOptional({ description: 'Thông tin người mượn', type: NguoiMuonEmbeddedDto })
     nguoi_muon?: NguoiMuonEmbeddedDto;
 
-    @ApiProperty({ description: 'Is currently on loan', example: true })
+    @ApiProperty({ description: 'Đang được mượn', example: true })
     dang_muon: boolean;
 
-    @ApiProperty({ description: 'Created date' })
+    @ApiProperty({ description: 'Ngày tạo' })
     ngay_tao: Date;
 }
 
@@ -244,10 +244,10 @@ export class NhatKySuDungResponseDto {
  * Response for assign/return operations
  */
 export class AssetOperationResponseDto {
-    @ApiProperty({ description: 'Success message' })
+    @ApiProperty({ description: 'Thông báo thành công' })
     message: string;
 
-    @ApiProperty({ description: 'Usage log record', type: NhatKySuDungResponseDto })
+    @ApiProperty({ description: 'Bản ghi nhật ký sử dụng', type: NhatKySuDungResponseDto })
     data: NhatKySuDungResponseDto;
 }
 
@@ -259,7 +259,7 @@ export class NhatKySuDungListResponseDto {
     data: NhatKySuDungResponseDto[];
 
     @ApiProperty({
-        description: 'Pagination info',
+        description: 'Thông tin phân trang',
         example: { page: 1, limit: 20, total: 50, totalPages: 3 },
     })
     meta: {

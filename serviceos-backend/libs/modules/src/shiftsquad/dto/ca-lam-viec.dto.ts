@@ -48,7 +48,7 @@ const DAYS_OF_WEEK_REGEX = /^[2-8](,[2-8])*$/;
  */
 export class CreateCaLamViecDto {
     @ApiProperty({
-        description: 'Shift name',
+        description: 'Tên ca làm việc',
         example: 'Ca Sang',
         maxLength: 100,
     })
@@ -59,7 +59,7 @@ export class CreateCaLamViecDto {
     ten_ca: string;
 
     @ApiProperty({
-        description: 'Start time (HH:mm format, 24-hour)',
+        description: 'Giờ bắt đầu (định dạng HH:mm, 24 giờ)',
         example: '08:00',
     })
     @IsNotEmpty({ message: 'Gio bat dau khong duoc de trong' })
@@ -70,7 +70,7 @@ export class CreateCaLamViecDto {
     gio_bat_dau: string;
 
     @ApiProperty({
-        description: 'End time (HH:mm format, 24-hour)',
+        description: 'Giờ kết thúc (định dạng HH:mm, 24 giờ)',
         example: '17:00',
     })
     @IsNotEmpty({ message: 'Gio ket thuc khong duoc de trong' })
@@ -81,7 +81,7 @@ export class CreateCaLamViecDto {
     gio_ket_thuc: string;
 
     @ApiPropertyOptional({
-        description: 'Days of week to apply (comma-separated: 2=Mon, 3=Tue, ..., 8=Sun)',
+        description: 'Các ngày trong tuần áp dụng (phân cách bằng dấu phẩy: 2=Thứ 2, 3=Thứ 3, ..., 8=Chủ nhật)',
         example: '2,3,4,5,6',
         default: '2,3,4,5,6',
     })
@@ -102,7 +102,7 @@ export class CreateCaLamViecDto {
  */
 export class UpdateCaLamViecDto {
     @ApiPropertyOptional({
-        description: 'Shift name',
+        description: 'Tên ca làm việc',
         example: 'Ca Sang - Updated',
         maxLength: 100,
     })
@@ -113,7 +113,7 @@ export class UpdateCaLamViecDto {
     ten_ca?: string;
 
     @ApiPropertyOptional({
-        description: 'Start time (HH:mm format, 24-hour)',
+        description: 'Giờ bắt đầu (định dạng HH:mm, 24 giờ)',
         example: '07:30',
     })
     @IsOptional()
@@ -124,7 +124,7 @@ export class UpdateCaLamViecDto {
     gio_bat_dau?: string;
 
     @ApiPropertyOptional({
-        description: 'End time (HH:mm format, 24-hour)',
+        description: 'Giờ kết thúc (định dạng HH:mm, 24 giờ)',
         example: '17:30',
     })
     @IsOptional()
@@ -135,7 +135,7 @@ export class UpdateCaLamViecDto {
     gio_ket_thuc?: string;
 
     @ApiPropertyOptional({
-        description: 'Days of week to apply (comma-separated: 2=Mon, 3=Tue, ..., 8=Sun)',
+        description: 'Các ngày trong tuần áp dụng (phân cách bằng dấu phẩy: 2=Thứ 2, 3=Thứ 3, ..., 8=Chủ nhật)',
         example: '2,3,4,5,6,7',
     })
     @IsOptional()
@@ -146,7 +146,7 @@ export class UpdateCaLamViecDto {
     ap_dung_thu?: string;
 
     @ApiPropertyOptional({
-        description: 'Status (1=Active, 0=Inactive)',
+        description: 'Trạng thái (1=Hoạt động, 0=Không hoạt động)',
         example: 1,
     })
     @IsOptional()
@@ -164,7 +164,7 @@ export class UpdateCaLamViecDto {
  */
 export class QueryCaLamViecDto {
     @ApiPropertyOptional({
-        description: 'Page number',
+        description: 'Số trang',
         default: 1,
         minimum: 1,
     })
@@ -175,7 +175,7 @@ export class QueryCaLamViecDto {
     page?: number = 1;
 
     @ApiPropertyOptional({
-        description: 'Items per page',
+        description: 'Số mục mỗi trang',
         default: 20,
         minimum: 1,
         maximum: 100,
@@ -187,7 +187,7 @@ export class QueryCaLamViecDto {
     limit?: number = 20;
 
     @ApiPropertyOptional({
-        description: 'Filter by status (1=Active, 0=Inactive)',
+        description: 'Lọc theo trạng thái (1=Hoạt động, 0=Không hoạt động)',
     })
     @IsOptional()
     @Type(() => Number)
@@ -195,7 +195,7 @@ export class QueryCaLamViecDto {
     trang_thai?: number;
 
     @ApiPropertyOptional({
-        description: 'Search by name',
+        description: 'Tìm kiếm theo tên',
     })
     @IsOptional()
     @IsString()
@@ -211,28 +211,28 @@ export class QueryCaLamViecDto {
  * Response DTO for a shift
  */
 export class CaLamViecResponseDto {
-    @ApiProperty({ description: 'Shift ID (UUID)' })
+    @ApiProperty({ description: 'ID ca làm việc (UUID)' })
     id: string;
 
-    @ApiProperty({ description: 'Shift name', example: 'Ca Sang' })
+    @ApiProperty({ description: 'Tên ca làm việc', example: 'Ca Sang' })
     ten_ca: string;
 
-    @ApiProperty({ description: 'Start time', example: '08:00:00' })
+    @ApiProperty({ description: 'Giờ bắt đầu', example: '08:00:00' })
     gio_bat_dau: Date;
 
-    @ApiProperty({ description: 'End time', example: '17:00:00' })
+    @ApiProperty({ description: 'Giờ kết thúc', example: '17:00:00' })
     gio_ket_thuc: Date;
 
-    @ApiProperty({ description: 'Days of week applied', example: '2,3,4,5,6' })
+    @ApiProperty({ description: 'Các ngày trong tuần áp dụng', example: '2,3,4,5,6' })
     ap_dung_thu: string;
 
-    @ApiProperty({ description: 'Status (1=Active, 0=Inactive)', example: 1 })
+    @ApiProperty({ description: 'Trạng thái (1=Hoạt động, 0=Không hoạt động)', example: 1 })
     trang_thai: number;
 
-    @ApiProperty({ description: 'Created date' })
+    @ApiProperty({ description: 'Ngày tạo' })
     ngay_tao: Date;
 
-    @ApiProperty({ description: 'Updated date' })
+    @ApiProperty({ description: 'Ngày cập nhật' })
     ngay_cap_nhat: Date;
 }
 

@@ -56,7 +56,7 @@ import {
     NhatKySuDungListResponseDto,
 } from '../dto/nhat-ky-su-dung.dto';
 
-@ApiTags('AssetTrack - Tai San (Assets)')
+@ApiTags('AssetTrack - Tài sản (Assets)')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiExtraModels(
@@ -75,26 +75,26 @@ export class TaiSanController {
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({
-        summary: 'Create new asset',
+        summary: 'Tạo tài sản mới',
         description: `
-Create a new asset in the system.
+Tạo một tài sản mới trong hệ thống.
 
-**Features:**
-- Auto-generate asset code if not provided
-- Validate unique serial number per tenant
-- Set initial status to AVAILABLE
+**Tính năng:**
+- Tự động tạo mã tài sản nếu không cung cấp
+- Kiểm tra duy nhất số seri trong doanh nghiệp
+- Đặt trạng thái ban đầu là AVAILABLE
 
-**Asset Types Suggestions:**
+**Gợi ý loại tài sản:**
 Laptop, Desktop, Printer, Phone, Tablet, Vehicle, Tool, Furniture
         `,
     })
     @ApiBody({ type: CreateTaiSanDto })
     @ApiResponse({
         status: HttpStatus.CREATED,
-        description: 'Asset created successfully',
+        description: 'Tài sản được tạo thành công',
         type: TaiSanResponseDto,
     })
-    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Serial number already exists' })
+    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Mã số seri đã tồn tại' })
     async create(
         @Body() dto: CreateTaiSanDto,
         @ActiveUser() user: ActiveUserData,
@@ -109,18 +109,18 @@ Laptop, Desktop, Printer, Phone, Tablet, Vehicle, Tool, Furniture
     @ApiOperation({
         summary: 'List assets',
         description: `
-Get paginated list of assets with filters.
+Lấy danh sách tài sản với bộ lọc.
 
-**Filters:**
-- \`loai_tai_san\`: Filter by asset type
+**Bộ lọc:**
+- \`loai_tai_san\`: Lọc theo loại tài sản
 - \`trang_thai\`: 1=Available, 2=InUse, 3=Maintenance, 4=Lost, 5=Disposed
-- \`nguoi_dang_giu\`: Filter by current holder (user ID)
-- \`search\`: Search by name, code, or serial
+- \`nguoi_dang_giu\`: Lọc theo người đang giữ (ID người dùng)
+- \`search\`: Tìm kiếm theo tên, mã, hoặc số seri
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'List of assets',
+        description: 'Danh sách tài sản',
         type: TaiSanListResponseDto,
     })
     async findAll(
@@ -152,19 +152,19 @@ Get paginated list of assets with filters.
     // ============================================================
     @Get('history')
     @ApiOperation({
-        summary: 'Get asset usage history',
+        summary: 'Lấy lịch sử sử dụng tài sản',
         description: `
-Get history of asset assignments (loans).
+Lấy lịch sử các lần phân công tài sản (mượn).
 
-**Filters:**
-- \`tai_san_id\`: Filter by specific asset
-- \`nguoi_muon_id\`: Filter by borrower
-- \`chua_tra\`: true = only show active loans (not yet returned)
+**Bộ lọc:**
+- \`tai_san_id\`: Lọc theo tài sản cụ thể
+- \`nguoi_muon_id\`: Lọc theo người mượn
+- \`chua_tra\`: true = chỉ hiển thị các khoản mượn đang hoạt động (chưa trả)
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Usage history',
+        description: 'Lịch sử sử dụng',
         type: NhatKySuDungListResponseDto,
     })
     async getUsageHistory(
@@ -179,12 +179,12 @@ Get history of asset assignments (loans).
     // ============================================================
     @Get(':id')
     @ApiOperation({
-        summary: 'Get asset details',
-        description: 'Get detailed information about an asset including current holder',
+        summary: 'Lấy chi tiết tài sản',
+        description: 'Lấy thông tin chi tiết về tài sản bao gồm người đang giữ',
     })
-    @ApiParam({ name: 'id', description: 'Asset UUID' })
+    @ApiParam({ name: 'id', description: 'UUID tài sản' })
     @ApiResponse({ status: HttpStatus.OK, type: TaiSanResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Asset not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy tài sản' })
     async findOne(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -197,14 +197,14 @@ Get history of asset assignments (loans).
     // ============================================================
     @Patch(':id')
     @ApiOperation({
-        summary: 'Update asset',
-        description: 'Update asset information',
+        summary: 'Cập nhật tài sản',
+        description: 'Cập nhật thông tin tài sản',
     })
-    @ApiParam({ name: 'id', description: 'Asset UUID' })
+    @ApiParam({ name: 'id', description: 'UUID tài sản' })
     @ApiBody({ type: UpdateTaiSanDto })
     @ApiResponse({ status: HttpStatus.OK, type: TaiSanResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Asset not found' })
-    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Serial number already exists' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy tài sản' })
+    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Mã số seri đã tồn tại' })
     async update(
         @Param('id', new ParseUUIDPipe()) id: string,
         @Body() dto: UpdateTaiSanDto,
@@ -218,13 +218,13 @@ Get history of asset assignments (loans).
     // ============================================================
     @Delete(':id')
     @ApiOperation({
-        summary: 'Delete asset (soft delete)',
-        description: 'Soft delete an asset. Cannot delete if asset is currently on loan.',
+        summary: 'Xóa tài sản (xóa mềm)',
+        description: 'Xóa mềm tài sản. Không thể xóa nếu tài sản đang được mượn.',
     })
-    @ApiParam({ name: 'id', description: 'Asset UUID' })
+    @ApiParam({ name: 'id', description: 'UUID tài sản' })
     @ApiResponse({ status: HttpStatus.OK, type: TaiSanResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Asset not found' })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Asset is currently on loan' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy tài sản' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Tài sản đang được mượn' })
     async remove(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -238,26 +238,26 @@ Get history of asset assignments (loans).
     @Post('assign')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
-        summary: 'Assign asset to user',
+        summary: 'Phân công tài sản cho người dùng',
         description: `
-Assign an asset to a user (loan out).
+Phân công tài sản cho người dùng (cho mượn).
 
-**Business Rules:**
-- Asset must be AVAILABLE status
-- Asset must not be currently held by someone else
-- Creates a usage log record (NhatKySuDung)
-- Updates asset status to IN_USE
+**Quy tắc nghiệp vụ:**
+- Tài sản phải ở trạng thái AVAILABLE
+- Tài sản không được đang được giữ bởi người khác
+- Tạo bản ghi nhật ký sử dụng (NhatKySuDung)
+- Cập nhật trạng thái tài sản thành IN_USE
         `,
     })
     @ApiBody({ type: AssignAssetDto })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Asset assigned successfully',
+        description: 'Tài sản đã được phân công thành công',
         type: AssetOperationResponseDto,
     })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Asset or User not found' })
-    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Asset already assigned' })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Asset not available' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy tài sản hoặc người dùng' })
+    @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Tài sản đã được phân công' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Tài sản không khả dụng' })
     async assignAsset(
         @Body() dto: AssignAssetDto,
         @ActiveUser() user: ActiveUserData,
@@ -271,23 +271,23 @@ Assign an asset to a user (loan out).
     @Post('return')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
-        summary: 'Return asset from user',
+        summary: 'Trả tài sản từ người dùng',
         description: `
-Return an asset (end loan).
+Trả lại tài sản (kết thúc việc mượn).
 
-**Business Rules:**
-- Asset must have an active loan record
-- Updates loan record with return date and condition
-- Updates asset status back to AVAILABLE
+**Quy tắc nghiệp vụ:**
+- Tài sản phải có bản ghi mượn đang hoạt động
+- Cập nhật bản ghi mượn với ngày trả và tình trạng
+- Cập nhật trạng thái tài sản về AVAILABLE
         `,
     })
     @ApiBody({ type: ReturnAssetDto })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Asset returned successfully',
+        description: 'Tài sản đã được trả thành công',
         type: AssetOperationResponseDto,
     })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Asset is not currently on loan' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Tài sản hiện không được mượn' })
     async returnAsset(
         @Body() dto: ReturnAssetDto,
         @ActiveUser() user: ActiveUserData,

@@ -47,7 +47,7 @@ import {
     CaLamViecListResponseDto,
 } from '../dto/ca-lam-viec.dto';
 
-@ApiTags('ShiftSquad - Ca Lam Viec (Shifts)')
+@ApiTags('ShiftSquad - Ca Làm Việc')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiExtraModels(CaLamViecResponseDto, CaLamViecListResponseDto)
@@ -56,33 +56,33 @@ export class CaLamViecController {
     constructor(private readonly caLamViecService: CaLamViecService) { }
 
     // ============================================================
-    // POST /shifts - Create new shift
+    // POST /shifts - Tạo ca làm việc mới
     // ============================================================
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({
-        summary: 'Create new work shift',
+        summary: 'Tạo ca làm việc mới',
         description: `
-Create a new work shift configuration.
+Tạo cấu hình ca làm việc mới.
 
-**Input:**
-- \`ten_ca\`: Shift name (e.g., "Ca Sang", "Ca Chieu")
-- \`gio_bat_dau\`: Start time in HH:mm format (24-hour)
-- \`gio_ket_thuc\`: End time in HH:mm format (24-hour)
-- \`ap_dung_thu\`: Days of week (comma-separated: 2=Mon, 3=Tue, ..., 8=Sun)
+**Dữ liệu đầu vào:**
+- \`ten_ca\`: Tên ca (ví dụ: "Ca Sáng", "Ca Chiều")
+- \`gio_bat_dau\`: Giờ bắt đầu theo định dạng HH:mm (24 giờ)
+- \`gio_ket_thuc\`: Giờ kết thúc theo định dạng HH:mm (24 giờ)
+- \`ap_dung_thu\`: Các ngày trong tuần (phân cách bằng dấu phẩy: 2=Thứ 2, 3=Thứ 3, ..., 8=Chủ nhật)
 
-**Example:**
-- Morning shift: 08:00 - 12:00, Mon-Fri: "2,3,4,5,6"
-- Afternoon shift: 13:00 - 17:00, Mon-Sat: "2,3,4,5,6,7"
+**Ví dụ:**
+- Ca sáng: 08:00 - 12:00, Thứ 2-Chủ nhật: "2,3,4,5,6,7,8"
+- Ca chiều: 13:00 - 17:00, Thứ 2-Thứ 7: "2,3,4,5,6,7"
         `,
     })
     @ApiBody({ type: CreateCaLamViecDto })
     @ApiResponse({
         status: HttpStatus.CREATED,
-        description: 'Shift created successfully',
+        description: 'Ca làm việc đã được tạo thành công',
         type: CaLamViecResponseDto,
     })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data or time format' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Dữ liệu không hợp lệ hoặc định dạng thời gian sai' })
     async create(
         @Body() dto: CreateCaLamViecDto,
         @ActiveUser() user: ActiveUserData,
@@ -91,23 +91,23 @@ Create a new work shift configuration.
     }
 
     // ============================================================
-    // GET /shifts - List all shifts
+    // GET /shifts - Liệt kê tất cả ca làm việc
     // ============================================================
     @Get()
     @ApiOperation({
-        summary: 'List all work shifts',
+        summary: 'Liệt kê tất cả ca làm việc',
         description: `
-Get all configured work shifts for the tenant.
+Lấy tất cả ca làm việc đã cấu hình cho tenant.
 
-**Features:**
-- Pagination: page, limit
-- Filter by status (active/inactive)
-- Search by name
+**Tính năng:**
+- Phân trang: page, limit
+- Lọc theo trạng thái (hoạt động/không hoạt động)
+- Tìm kiếm theo tên
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'List of shifts',
+        description: 'Danh sách ca làm việc',
         type: CaLamViecListResponseDto,
     })
     async findAll(
@@ -118,28 +118,28 @@ Get all configured work shifts for the tenant.
     }
 
     // ============================================================
-    // GET /shifts/current - Get current applicable shift
+    // GET /shifts/current - Lấy ca làm việc hiện tại áp dụng
     // ============================================================
     @Get('current')
     @ApiOperation({
-        summary: 'Get current applicable shift',
+        summary: 'Lấy ca làm việc hiện tại áp dụng',
         description: `
-Determine which shift applies to the current time and day of week.
+Xác định ca làm việc nào áp dụng cho thời gian và ngày trong tuần hiện tại.
 
 **Logic:**
-1. Check current local time
-2. Check current day of week
-3. Find active shift that matches both criteria
-4. Return shift info or null if no match
+1. Kiểm tra thời gian địa phương hiện tại
+2. Kiểm tra ngày trong tuần hiện tại
+3. Tìm ca làm việc hoạt động phù hợp với cả hai tiêu chí
+4. Trả về thông tin ca hoặc null nếu không tìm thấy
 
-Useful for:
-- Mobile app to show which shift the user should be in
-- Auto-detecting shift for check-in/check-out
+Hữu ích cho:
+- Ứng dụng di động để hiển thị ca nào người dùng nên ở trong
+- Tự động phát hiện ca cho check-in/check-out
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Current shift or null',
+        description: 'Ca làm việc hiện tại hoặc null',
         schema: {
             oneOf: [
                 { $ref: '#/components/schemas/CaLamViecResponseDto' },
@@ -152,16 +152,16 @@ Useful for:
     }
 
     // ============================================================
-    // GET /shifts/:id - Get shift by ID
+    // GET /shifts/:id - Lấy chi tiết ca làm việc
     // ============================================================
     @Get(':id')
     @ApiOperation({
-        summary: 'Get shift details',
-        description: 'Get detailed information about a specific shift',
+        summary: 'Lấy chi tiết ca làm việc',
+        description: 'Lấy thông tin chi tiết về một ca làm việc cụ thể',
     })
-    @ApiParam({ name: 'id', description: 'Shift UUID' })
+    @ApiParam({ name: 'id', description: 'UUID ca làm việc' })
     @ApiResponse({ status: HttpStatus.OK, type: CaLamViecResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Shift not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy ca làm việc' })
     async findOne(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -170,27 +170,27 @@ Useful for:
     }
 
     // ============================================================
-    // PATCH /shifts/:id - Update shift
+    // PATCH /shifts/:id - Cập nhật ca làm việc
     // ============================================================
     @Patch(':id')
     @ApiOperation({
-        summary: 'Update shift',
+        summary: 'Cập nhật ca làm việc',
         description: `
-Update an existing shift configuration.
+Cập nhật cấu hình ca làm việc hiện có.
 
-**Updatable fields:**
-- \`ten_ca\`: Shift name
-- \`gio_bat_dau\`: Start time (HH:mm)
-- \`gio_ket_thuc\`: End time (HH:mm)
-- \`ap_dung_thu\`: Days of week
-- \`trang_thai\`: Status (1=Active, 0=Inactive)
+**Các trường có thể cập nhật:**
+- \`ten_ca\`: Tên ca
+- \`gio_bat_dau\`: Giờ bắt đầu (HH:mm)
+- \`gio_ket_thuc\`: Giờ kết thúc (HH:mm)
+- \`ap_dung_thu\`: Các ngày trong tuần
+- \`trang_thai\`: Trạng thái (1=Hoạt động, 0=Không hoạt động)
         `,
     })
-    @ApiParam({ name: 'id', description: 'Shift UUID' })
+    @ApiParam({ name: 'id', description: 'UUID ca làm việc' })
     @ApiBody({ type: UpdateCaLamViecDto })
     @ApiResponse({ status: HttpStatus.OK, type: CaLamViecResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Shift not found' })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy ca làm việc' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Dữ liệu không hợp lệ' })
     async update(
         @Param('id', new ParseUUIDPipe()) id: string,
         @Body() dto: UpdateCaLamViecDto,
@@ -200,20 +200,20 @@ Update an existing shift configuration.
     }
 
     // ============================================================
-    // DELETE /shifts/:id - Soft delete shift
+    // DELETE /shifts/:id - Xóa ca làm việc (xóa mềm)
     // ============================================================
     @Delete(':id')
     @ApiOperation({
-        summary: 'Delete shift (soft delete)',
+        summary: 'Xóa ca làm việc (xóa mềm)',
         description: `
-Soft delete a shift. The shift can be restored later.
+Xóa mềm một ca làm việc. Ca làm việc có thể được khôi phục sau này.
 
-Note: Deleting a shift does not affect existing attendance records.
+Lưu ý: Xóa ca làm việc không ảnh hưởng đến các bản ghi chấm công hiện có.
         `,
     })
-    @ApiParam({ name: 'id', description: 'Shift UUID' })
+    @ApiParam({ name: 'id', description: 'UUID ca làm việc' })
     @ApiResponse({ status: HttpStatus.OK, type: CaLamViecResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Shift not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy ca làm việc' })
     async remove(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -222,16 +222,16 @@ Note: Deleting a shift does not affect existing attendance records.
     }
 
     // ============================================================
-    // PATCH /shifts/:id/restore - Restore deleted shift
+    // PATCH /shifts/:id/restore - Khôi phục ca làm việc đã xóa
     // ============================================================
     @Patch(':id/restore')
     @ApiOperation({
-        summary: 'Restore deleted shift',
-        description: 'Restore a previously soft-deleted shift',
+        summary: 'Khôi phục ca làm việc đã xóa',
+        description: 'Khôi phục một ca làm việc đã bị xóa mềm trước đó',
     })
-    @ApiParam({ name: 'id', description: 'Shift UUID' })
+    @ApiParam({ name: 'id', description: 'UUID ca làm việc' })
     @ApiResponse({ status: HttpStatus.OK, type: CaLamViecResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Deleted shift not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy ca làm việc đã xóa' })
     async restore(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,

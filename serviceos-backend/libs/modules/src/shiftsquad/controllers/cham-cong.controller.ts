@@ -48,7 +48,7 @@ import {
     DailyReportResponseDto,
 } from '../dto/cham-cong.dto';
 
-@ApiTags('ShiftSquad - Cham Cong (Attendance)')
+@ApiTags('ShiftSquad - Chấm Công')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiExtraModels(
@@ -63,43 +63,43 @@ export class ChamCongController {
     constructor(private readonly chamCongService: ChamCongService) { }
 
     // ============================================================
-    // POST /attendance/check-in - Employee check-in
+    // POST /attendance/check-in - Nhân viên check-in
     // ============================================================
     @Post('check-in')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
-        summary: 'Employee check-in',
+        summary: 'Nhân viên check-in',
         description: `
-Employee clock-in for the day.
+Nhân viên điểm danh vào ca làm việc.
 
-**Features:**
-- Auto-detects current shift based on time and day
-- Prevents double check-in (only one check-in per day)
-- Tracks GPS coordinates for location verification
-- Supports check-in photo (selfie URL)
-- Automatically marks as "Late" if check-in is 15+ minutes after shift start
+**Tính năng:**
+- Tự động phát hiện ca làm việc hiện tại dựa trên thời gian và ngày
+- Ngăn chặn check-in trùng lặp (chỉ một lần check-in mỗi ngày)
+- Theo dõi tọa độ GPS để xác minh vị trí
+- Hỗ trợ ảnh check-in (URL selfie)
+- Tự động đánh dấu "Đi trễ" nếu check-in muộn hơn 15 phút so với giờ bắt đầu ca
 
-**Input:**
-- \`toa_do_lat\`: Latitude (-90 to 90)
-- \`toa_do_lng\`: Longitude (-180 to 180)
-- \`anh_checkin\`: Photo URL (optional)
-- \`ghi_chu\`: Notes (optional)
+**Dữ liệu đầu vào:**
+- \`toa_do_lat\`: Vĩ độ (-90 đến 90)
+- \`toa_do_lng\`: Kinh độ (-180 đến 180)
+- \`anh_checkin\`: URL ảnh (tùy chọn)
+- \`ghi_chu\`: Ghi chú (tùy chọn)
 
-**Output:**
-- Check-in confirmation with timestamp
-- Detected shift information (if applicable)
-- Attendance record
+**Dữ liệu đầu ra:**
+- Xác nhận check-in với thời gian
+- Thông tin ca làm việc được phát hiện (nếu có)
+- Bản ghi chấm công
         `,
     })
     @ApiBody({ type: CheckInDto })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Check-in successful',
+        description: 'Check-in thành công',
         type: CheckInResponseDto,
     })
     @ApiResponse({
         status: HttpStatus.CONFLICT,
-        description: 'Already checked in today',
+        description: 'Đã check-in hôm nay',
     })
     async checkIn(
         @Body() dto: CheckInDto,
@@ -109,44 +109,44 @@ Employee clock-in for the day.
     }
 
     // ============================================================
-    // POST /attendance/check-out - Employee check-out
+    // POST /attendance/check-out - Nhân viên check-out
     // ============================================================
     @Post('check-out')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
-        summary: 'Employee check-out',
+        summary: 'Nhân viên check-out',
         description: `
-Employee clock-out for the day.
+Nhân viên điểm danh ra ca làm việc.
 
-**Requirements:**
-- Must have checked in first
-- Cannot check-out multiple times
+**Yêu cầu:**
+- Phải đã check-in trước đó
+- Không thể check-out nhiều lần
 
-**Features:**
-- Updates check-out time, location, and photo
-- Calculates total working hours
-- Marks as "Early Leave" if check-out is 15+ minutes before shift end
+**Tính năng:**
+- Cập nhật thời gian check-out, vị trí và ảnh
+- Tính toán tổng số giờ làm việc
+- Đánh dấu "Về sớm" nếu check-out sớm hơn 15 phút so với giờ kết thúc ca
 
-**Input:**
-- \`toa_do_lat\`: Latitude (-90 to 90)
-- \`toa_do_lng\`: Longitude (-180 to 180)
-- \`anh_checkout\`: Photo URL (optional)
+**Dữ liệu đầu vào:**
+- \`toa_do_lat\`: Vĩ độ (-90 đến 90)
+- \`toa_do_lng\`: Kinh độ (-180 đến 180)
+- \`anh_checkout\`: URL ảnh (tùy chọn)
 
-**Output:**
-- Check-out confirmation with timestamp
-- Calculated working hours
-- Updated attendance record
+**Dữ liệu đầu ra:**
+- Xác nhận check-out với thời gian
+- Số giờ làm việc đã tính
+- Bản ghi chấm công đã cập nhật
         `,
     })
     @ApiBody({ type: CheckOutDto })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Check-out successful',
+        description: 'Check-out thành công',
         type: CheckOutResponseDto,
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST,
-        description: 'Not checked in or already checked out',
+        description: 'Chưa check-in hoặc đã check-out',
     })
     async checkOut(
         @Body() dto: CheckOutDto,
@@ -156,24 +156,24 @@ Employee clock-out for the day.
     }
 
     // ============================================================
-    // GET /attendance/today - Quick status check
+    // GET /attendance/today - Kiểm tra trạng thái nhanh
     // ============================================================
     @Get('today')
     @ApiOperation({
-        summary: 'Get today attendance status',
+        summary: 'Lấy trạng thái chấm công hôm nay',
         description: `
-Quick check for today's attendance status.
+Kiểm tra nhanh trạng thái chấm công hôm nay.
 
-Useful for mobile app to determine:
-- Should show "Check-in" button? (not checked in yet)
-- Should show "Check-out" button? (checked in but not out)
-- Already completed for today? (both done)
+Hữu ích cho ứng dụng di động để xác định:
+- Có nên hiển thị nút "Check-in"? (chưa check-in)
+- Có nên hiển thị nút "Check-out"? (đã check-in nhưng chưa check-out)
+- Đã hoàn thành cho hôm nay? (cả hai đã xong)
 
-**Output:**
+**Dữ liệu đầu ra:**
 - \`status\`: 'NOT_CHECKED_IN' | 'CHECKED_IN' | 'CHECKED_OUT'
 - \`can_checkin\`: boolean
 - \`can_checkout\`: boolean
-- \`data\`: Attendance record (if exists)
+- \`data\`: Bản ghi chấm công (nếu có)
         `,
     })
     @ApiResponse({
@@ -196,30 +196,30 @@ Useful for mobile app to determine:
     }
 
     // ============================================================
-    // GET /attendance/my-timesheet - Personal timesheet
+    // GET /attendance/my-timesheet - Bảng chấm công cá nhân
     // ============================================================
     @Get('my-timesheet')
     @ApiOperation({
-        summary: 'Get personal timesheet',
+        summary: 'Lấy bảng chấm công cá nhân',
         description: `
-Get attendance records for a specific month/year.
+Lấy bản ghi chấm công cho một tháng/năm cụ thể.
 
-**Input:**
-- \`thang\`: Month (1-12)
-- \`nam\`: Year (e.g., 2026)
+**Dữ liệu đầu vào:**
+- \`thang\`: Tháng (1-12)
+- \`nam\`: Năm (ví dụ: 2026)
 
-**Output:**
-- List of attendance records for the month
-- Summary statistics:
-  - \`tong_ngay_lam\`: Total working days
-  - \`tong_gio_lam\`: Total working hours
-  - \`so_ngay_di_tre\`: Number of late days
-  - \`so_ngay_vang\`: Number of absent days
+**Dữ liệu đầu ra:**
+- Danh sách bản ghi chấm công trong tháng
+- Thống kê tổng hợp:
+  - \`tong_ngay_lam\`: Tổng số ngày làm việc
+  - \`tong_gio_lam\`: Tổng số giờ làm việc
+  - \`so_ngay_di_tre\`: Số ngày đi trễ
+  - \`so_ngay_vang\`: Số ngày vắng mặt
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Timesheet data',
+        description: 'Dữ liệu bảng chấm công',
         type: TimesheetResponseDto,
     })
     async getMyTimesheet(
@@ -230,37 +230,37 @@ Get attendance records for a specific month/year.
     }
 
     // ============================================================
-    // GET /attendance/daily-report - Manager view
+    // GET /attendance/daily-report - Báo cáo hàng ngày (Quản lý)
     // ============================================================
     @Get('daily-report')
     @ApiOperation({
-        summary: 'Get daily attendance report (Manager)',
+        summary: 'Lấy báo cáo chấm công hàng ngày (Quản lý)',
         description: `
-Get attendance status for all employees on a specific date.
+Lấy trạng thái chấm công của tất cả nhân viên trong một ngày cụ thể.
 
-**For Manager/Admin use.**
+**Dành cho Quản lý/Admin.**
 
-**Input:**
-- \`ngay\`: Date (YYYY-MM-DD format)
-- \`page\`: Page number (default: 1)
-- \`limit\`: Items per page (default: 50)
+**Dữ liệu đầu vào:**
+- \`ngay\`: Ngày (định dạng YYYY-MM-DD)
+- \`page\`: Số trang (mặc định: 1)
+- \`limit\`: Số mục mỗi trang (mặc định: 50)
 
-**Output:**
-- List of employees with their status:
+**Dữ liệu đầu ra:**
+- Danh sách nhân viên với trạng thái:
   - \`trang_thai_text\`: 'PRESENT' | 'ABSENT' | 'LATE' | 'EARLY_LEAVE' | 'NOT_CHECKED_IN'
-  - Check-in/out times
-  - Working hours
-  - Shift info
-- Summary:
-  - \`tong_nhan_vien\`: Total employees
-  - \`co_mat\`: Present count
-  - \`vang_mat\`: Absent count
-  - \`di_tre\`: Late count
+  - Thời gian check-in/out
+  - Số giờ làm việc
+  - Thông tin ca làm
+- Tổng hợp:
+  - \`tong_nhan_vien\`: Tổng số nhân viên
+  - \`co_mat\`: Số lượng có mặt
+  - \`vang_mat\`: Số lượng vắng mặt
+  - \`di_tre\`: Số lượng đi trễ
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Daily report data',
+        description: 'Dữ liệu báo cáo hàng ngày',
         type: DailyReportResponseDto,
     })
     async getDailyReport(
@@ -271,16 +271,16 @@ Get attendance status for all employees on a specific date.
     }
 
     // ============================================================
-    // GET /attendance/:id - Get record by ID
+    // GET /attendance/:id - Lấy bản ghi theo ID
     // ============================================================
     @Get(':id')
     @ApiOperation({
-        summary: 'Get attendance record by ID',
-        description: 'Get detailed information about a specific attendance record',
+        summary: 'Lấy bản ghi chấm công theo ID',
+        description: 'Lấy thông tin chi tiết về một bản ghi chấm công cụ thể',
     })
-    @ApiParam({ name: 'id', description: 'Attendance record UUID' })
+    @ApiParam({ name: 'id', description: 'UUID bản ghi chấm công' })
     @ApiResponse({ status: HttpStatus.OK, type: ChamCongResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Record not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy bản ghi' })
     async findOne(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,

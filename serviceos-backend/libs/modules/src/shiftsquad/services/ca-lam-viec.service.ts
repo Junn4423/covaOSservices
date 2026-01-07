@@ -97,7 +97,7 @@ export class CaLamViecService {
         });
 
         this.logger.log(
-            `Created shift: ${ten_ca} (${gio_bat_dau} - ${gio_ket_thuc}) [Tenant: ${idDoanhNghiep}]`
+            `Tao ca lam viec: ${ten_ca} (${gio_bat_dau} - ${gio_ket_thuc}) [Tenant: ${idDoanhNghiep}]`
         );
 
         return this.transformShift(shift);
@@ -223,14 +223,14 @@ export class CaLamViecService {
             // Check if current time is within shift hours
             if (currentTimeMinutes >= startMinutes && currentTimeMinutes <= endMinutes) {
                 this.logger.log(
-                    `Current shift detected: ${shift.ten_ca} for day ${vnDay}`
+                    `Phat hien ca hien tai: ${shift.ten_ca} cho ngay ${vnDay}`
                 );
                 return this.transformShift(shift);
             }
         }
 
         this.logger.log(
-            `No active shift found for current time: ${currentHours}:${currentMinutes}, day: ${vnDay}`
+            `Khong tim thay ca hoat dong nao cho thoi gian hien tai: ${currentHours}:${currentMinutes}, ngay: ${vnDay}`
         );
         return null;
     }
@@ -345,7 +345,7 @@ export class CaLamViecService {
             data: updateData,
         });
 
-        this.logger.log(`Updated shift: ${id}`);
+        this.logger.log(`Cap nhat ca lam viec: ${id}`);
         return this.transformShift(updated);
     }
 
@@ -363,7 +363,7 @@ export class CaLamViecService {
             },
         });
 
-        this.logger.log(`Soft deleted shift: ${shift.ten_ca}`);
+        this.logger.log(`Xoa mem ca lam viec: ${shift.ten_ca}`);
         return this.transformShift(deleted);
     }
 
@@ -391,7 +391,7 @@ export class CaLamViecService {
             },
         });
 
-        this.logger.log(`Restored shift: ${shift.ten_ca}`);
+        this.logger.log(`Khoi phuc ca lam viec: ${shift.ten_ca}`);
         return this.transformShift(restored);
     }
 }

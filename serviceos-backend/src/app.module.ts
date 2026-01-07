@@ -33,10 +33,10 @@ import {
     RouteOptimaModule,
     CustomerPortalModule,
     NotificationModule,
+    BillingModule,
     // Uncomment khi implement cac module khac:
     // CashFlowModule,
     // ProcurePoolModule,
-    // BillingModule,
 } from '@libs/modules';
 
 // App
@@ -76,6 +76,7 @@ import { AppService } from './app.service';
         RouteOptimaModule,       // Phase 12: Route Management
         CustomerPortalModule,    // Phase 13: Customer Portal
         NotificationModule,      // Phase 13: Notification System
+        BillingModule,           // Phase 14: SaaS Subscription Management
     ],
     controllers: [AppController],
     providers: [

@@ -50,7 +50,7 @@ import {
 } from '../dto/lo-trinh.dto';
 import { UpdateStopStatusDto, UpdateStopResponseDto } from '../dto/diem-dung.dto';
 
-@ApiTags('RouteOptima - Lo Trinh (Routes)')
+@ApiTags('RouteOptima - Lộ Trình (Routes)')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiExtraModels(LoTrinhResponseDto, LoTrinhListResponseDto, UpdateStopResponseDto)
@@ -64,33 +64,33 @@ export class LoTrinhController {
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({
-        summary: 'Create route with stops',
+        summary: 'Tạo lộ trình với các điểm dừng',
         description: `
-Create a new route with multiple stops for a staff member.
+Tạo lộ trình mới với nhiều điểm dừng cho nhân viên.
 
-**Input:**
-- \`ngay_lo_trinh\`: Date (YYYY-MM-DD)
-- \`nguoi_dung_id\`: Staff/Driver user ID
-- \`stops\`: Array of stop items (at least 1 required)
-  - \`thu_tu\`: Stop order (1, 2, 3...)
-  - \`dia_chi\`: Address
-  - \`toa_do_lat\`, \`toa_do_lng\`: GPS coordinates
-  - \`thoi_gian_den_du_kien\`: Expected arrival time
-  - \`cong_viec_id\`: Related job ID (optional)
-  - \`ghi_chu\`: Notes
+**Đầu vào:**
+- \`ngay_lo_trinh\`: Ngày (YYYY-MM-DD)
+- \`nguoi_dung_id\`: ID nhân viên/lái xe
+- \`stops\`: Mảng các điểm dừng (cần ít nhất 1)
+  - \`thu_tu\`: Thứ tự điểm dừng (1, 2, 3...)
+  - \`dia_chi\`: Địa chỉ
+  - \`toa_do_lat\`, \`toa_do_lng\`: Tọa độ GPS
+  - \`thoi_gian_den_du_kien\`: Thời gian đến dự kiến
+  - \`cong_viec_id\`: ID công việc liên quan (tùy chọn)
+  - \`ghi_chu\`: Ghi chú
 
-**Creates:**
-- LoTrinh (Route header)
-- DiemDung records (Stops)
+**Tạo:**
+- LoTrinh (đầu lộ trình)
+- Bản ghi DiemDung (điểm dừng)
         `,
     })
     @ApiBody({ type: CreateLoTrinhDto })
     @ApiResponse({
         status: HttpStatus.CREATED,
-        description: 'Route created successfully',
+        description: 'Lộ trình được tạo thành công',
         type: LoTrinhResponseDto,
     })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User or Job not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy người dùng hoặc công việc' })
     async create(
         @Body() dto: CreateLoTrinhDto,
         @ActiveUser() user: ActiveUserData,
@@ -103,19 +103,19 @@ Create a new route with multiple stops for a staff member.
     // ============================================================
     @Get()
     @ApiOperation({
-        summary: 'List routes',
+        summary: 'Liệt kê lộ trình',
         description: `
-Get paginated list of routes.
+Lấy danh sách lộ trình phân trang.
 
-**Filters:**
-- \`ngay\`: Filter by date (YYYY-MM-DD)
-- \`nguoi_dung_id\`: Filter by staff ID
-- \`trang_thai\`: 0=Pending, 1=InProgress, 2=Completed, 3=Cancelled
+**Bộ lọc:**
+- \`ngay\`: Lọc theo ngày (YYYY-MM-DD)
+- \`nguoi_dung_id\`: Lọc theo ID nhân viên
+- \`trang_thai\`: 0=Chưa bắt đầu, 1=Đang thực hiện, 2=Hoàn thành, 3=Đã hủy
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'List of routes',
+        description: 'Danh sách lộ trình',
         type: LoTrinhListResponseDto,
     })
     async findAll(
@@ -130,21 +130,21 @@ Get paginated list of routes.
     // ============================================================
     @Get('my-route')
     @ApiOperation({
-        summary: 'Get my route for today',
+        summary: 'Lấy lộ trình của tôi hôm nay',
         description: `
-Get the route assigned to the current logged-in user.
+Lấy lộ trình được giao cho người dùng hiện tại đang đăng nhập.
 
-**Input:**
-- \`ngay\`: Optional date (YYYY-MM-DD). Defaults to today.
+**Đầu vào:**
+- \`ngay\`: Ngày tùy chọn (YYYY-MM-DD). Mặc định là hôm nay.
 
-**Output:**
-- Route with all stops ordered by \`thu_tu\`
-- null if no route for the date
+**Đầu ra:**
+- Lộ trình với tất cả điểm dừng được sắp xếp theo \`thu_tu\`
+- null nếu không có lộ trình cho ngày đó
         `,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'My route data',
+        description: 'Dữ liệu lộ trình của tôi',
         schema: {
             type: 'object',
             properties: {
@@ -165,12 +165,12 @@ Get the route assigned to the current logged-in user.
     // ============================================================
     @Get(':id')
     @ApiOperation({
-        summary: 'Get route details',
-        description: 'Get route with all stops',
+        summary: 'Lấy chi tiết lộ trình',
+        description: 'Lấy lộ trình với tất cả điểm dừng',
     })
-    @ApiParam({ name: 'id', description: 'Route UUID' })
+    @ApiParam({ name: 'id', description: 'UUID lộ trình' })
     @ApiResponse({ status: HttpStatus.OK, type: LoTrinhResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Route not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy lộ trình' })
     async findOne(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -183,13 +183,13 @@ Get the route assigned to the current logged-in user.
     // ============================================================
     @Patch(':id/start')
     @ApiOperation({
-        summary: 'Start route',
-        description: 'Mark route as started (IN_PROGRESS). Records start time.',
+        summary: 'Bắt đầu lộ trình',
+        description: 'Đánh dấu lộ trình đã bắt đầu (IN_PROGRESS). Ghi nhận thời gian bắt đầu.',
     })
-    @ApiParam({ name: 'id', description: 'Route UUID' })
+    @ApiParam({ name: 'id', description: 'UUID lộ trình' })
     @ApiResponse({ status: HttpStatus.OK, type: LoTrinhResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Route not found' })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Route already started' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy lộ trình' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Lộ trình đã bắt đầu' })
     async startRoute(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -202,13 +202,13 @@ Get the route assigned to the current logged-in user.
     // ============================================================
     @Patch(':id/cancel')
     @ApiOperation({
-        summary: 'Cancel route',
-        description: 'Cancel a route. Cannot cancel completed routes.',
+        summary: 'Hủy lộ trình',
+        description: 'Hủy lộ trình. Không thể hủy lộ trình đã hoàn thành.',
     })
-    @ApiParam({ name: 'id', description: 'Route UUID' })
+    @ApiParam({ name: 'id', description: 'UUID lộ trình' })
     @ApiResponse({ status: HttpStatus.OK, type: LoTrinhResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Route not found' })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Cannot cancel completed route' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy lộ trình' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Không thể hủy lộ trình đã hoàn thành' })
     async cancelRoute(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -221,16 +221,16 @@ Get the route assigned to the current logged-in user.
     // ============================================================
     @Patch(':id/optimize')
     @ApiOperation({
-        summary: 'Optimize route order',
+        summary: 'Tối ưu hóa thứ tự lộ trình',
         description: `
-Re-order stops for optimal route.
+Sắp xếp lại điểm dừng để tối ưu lộ trình.
 
-**Current Implementation:**
-- Placeholder - sorts by existing \`thu_tu\`
+**Triển khai hiện tại:**
+- Placeholder - sắp xếp theo \`thu_tu\` hiện có
 
-**Future:**
-- TSP (Traveling Salesman Problem) algorithm
-- Uses GPS coordinates to minimize travel distance
+**Tương lai:**
+- Thuật toán TSP (Traveling Salesman Problem)
+- Sử dụng tọa độ GPS để giảm thiểu khoảng cách di chuyển
         `,
     })
     @ApiParam({ name: 'id', description: 'Route UUID' })
@@ -245,8 +245,8 @@ Re-order stops for optimal route.
             },
         },
     })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Route not found' })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Route already started' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy lộ trình' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Lộ trình đã bắt đầu' })
     async optimizeRoute(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -259,12 +259,12 @@ Re-order stops for optimal route.
     // ============================================================
     @Delete(':id')
     @ApiOperation({
-        summary: 'Delete route (soft delete)',
-        description: 'Soft delete a route and all its stops.',
+        summary: 'Xóa lộ trình (xóa mềm)',
+        description: 'Xóa mềm lộ trình và tất cả điểm dừng của nó.',
     })
-    @ApiParam({ name: 'id', description: 'Route UUID' })
+    @ApiParam({ name: 'id', description: 'UUID lộ trình' })
     @ApiResponse({ status: HttpStatus.OK, type: LoTrinhResponseDto })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Route not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy lộ trình' })
     async remove(
         @Param('id', new ParseUUIDPipe()) id: string,
         @ActiveUser() user: ActiveUserData,
@@ -277,29 +277,29 @@ Re-order stops for optimal route.
     // ============================================================
     @Patch('stops/:id/status')
     @ApiOperation({
-        summary: 'Update stop status',
+        summary: 'Cập nhật trạng thái điểm dừng',
         description: `
-Mark a stop as Visited or Skipped.
+Đánh dấu điểm dừng là Đã ghé thăm hoặc Đã bỏ qua.
 
-**Input:**
-- \`trang_thai\`: 1 = Visited, 2 = Skipped
-- \`thoi_gian_den_thuc_te\`: Actual arrival time (optional, defaults to now)
-- \`toa_do_thuc_te_lat\`, \`toa_do_thuc_te_lng\`: Actual GPS (optional)
-- \`thoi_gian_roi_di\`: Departure time (optional)
+**Đầu vào:**
+- \`trang_thai\`: 1 = Đã ghé thăm, 2 = Đã bỏ qua
+- \`thoi_gian_den_thuc_te\`: Thời gian đến thực tế (tùy chọn, mặc định là bây giờ)
+- \`toa_do_thuc_te_lat\`, \`toa_do_thuc_te_lng\`: GPS thực tế (tùy chọn)
+- \`thoi_gian_roi_di\`: Thời gian rời đi (tùy chọn)
 
-**Behavior:**
-- If route status is PENDING, it becomes IN_PROGRESS
-- If all stops are Visited/Skipped, route becomes COMPLETED
+**Hành vi:**
+- Nếu trạng thái lộ trình là PENDING, nó sẽ trở thành IN_PROGRESS
+- Nếu tất cả điểm dừng đều Đã ghé thăm/Đã bỏ qua, lộ trình sẽ COMPLETED
         `,
     })
-    @ApiParam({ name: 'id', description: 'Stop UUID (DiemDung)' })
+    @ApiParam({ name: 'id', description: 'UUID điểm dừng (DiemDung)' })
     @ApiBody({ type: UpdateStopStatusDto })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Stop updated',
+        description: 'Điểm dừng đã cập nhật',
         type: UpdateStopResponseDto,
     })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Stop not found' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Không tìm thấy điểm dừng' })
     async updateStopStatus(
         @Param('id', new ParseUUIDPipe()) id: string,
         @Body() dto: UpdateStopStatusDto,

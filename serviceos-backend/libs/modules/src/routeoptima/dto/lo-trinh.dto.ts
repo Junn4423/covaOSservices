@@ -32,22 +32,22 @@ import { Transform, Type } from 'class-transformer';
 // ============================================================
 
 /**
- * Route status enum
+ * Enum trạng thái lộ trình
  */
 export enum TrangThaiLoTrinh {
-    PENDING = 0,      // Not started
-    IN_PROGRESS = 1,  // In progress
-    COMPLETED = 2,    // All stops visited
-    CANCELLED = 3,    // Cancelled
+    PENDING = 0,      // Chưa bắt đầu
+    IN_PROGRESS = 1,  // Đang thực hiện
+    COMPLETED = 2,    // Đã hoàn thành tất cả điểm dừng
+    CANCELLED = 3,    // Đã hủy
 }
 
 /**
- * Stop status enum
+ * Enum trạng thái điểm dừng
  */
 export enum TrangThaiDiemDung {
-    PENDING = 0,   // Not visited
-    VISITED = 1,   // Visited/Completed
-    SKIPPED = 2,   // Skipped
+    PENDING = 0,   // Chưa ghé thăm
+    VISITED = 1,   // Đã ghé thăm/Hoàn thành
+    SKIPPED = 2,   // Đã bỏ qua
 }
 
 // ============================================================
@@ -55,7 +55,7 @@ export enum TrangThaiDiemDung {
 // ============================================================
 
 /**
- * Convert Prisma Decimal to number for route distance/coordinates
+ * Chuyển đổi Prisma Decimal thành number cho khoảng cách/tọa độ lộ trình
  */
 function decimalToNumber(decimal: any): number {
     if (!decimal) return 0;
@@ -69,75 +69,75 @@ function decimalToNumber(decimal: any): number {
 // ============================================================
 
 /**
- * Stop item when creating a route
+ * Item điểm dừng khi tạo lộ trình
  */
 export class CreateDiemDungItemDto {
     @ApiProperty({
-        description: 'Stop order (1, 2, 3...)',
+        description: 'Thứ tự điểm dừng (1, 2, 3...)',
         example: 1,
         minimum: 1,
     })
-    @IsNotEmpty({ message: 'Thu tu diem dung khong duoc de trong' })
+    @IsNotEmpty({ message: 'Thứ tự điểm dừng không được để trống' })
     @Type(() => Number)
-    @IsInt({ message: 'Thu tu phai la so nguyen' })
-    @Min(1, { message: 'Thu tu phai >= 1' })
+    @IsInt({ message: 'Thứ tự phải là số nguyên' })
+    @Min(1, { message: 'Thứ tự phải >= 1' })
     thu_tu: number;
 
     @ApiPropertyOptional({
-        description: 'Stop address',
-        example: '123 Nguyen Hue, Q1, HCM',
+        description: 'Địa chỉ điểm dừng',
+        example: '123 Nguyễn Huệ, Q1, HCM',
     })
     @IsOptional()
-    @IsString({ message: 'Dia chi phai la chuoi' })
+    @IsString({ message: 'Địa chỉ phải là chuỗi' })
     @Transform(({ value }) => value?.trim())
     dia_chi?: string;
 
     @ApiPropertyOptional({
-        description: 'Latitude',
+        description: 'Tọa độ vĩ độ (Latitude)',
         example: 10.762622,
         minimum: -90,
         maximum: 90,
     })
     @IsOptional()
-    @IsNumber({}, { message: 'Toa do lat phai la so' })
-    @Min(-90, { message: 'Latitude phai trong khoang -90 den 90' })
-    @Max(90, { message: 'Latitude phai trong khoang -90 den 90' })
+    @IsNumber({}, { message: 'Tọa độ lat phải là số' })
+    @Min(-90, { message: 'Tọa độ lat phải trong khoảng -90 đến 90' })
+    @Max(90, { message: 'Tọa độ lat phải trong khoảng -90 đến 90' })
     @Type(() => Number)
     toa_do_lat?: number;
 
     @ApiPropertyOptional({
-        description: 'Longitude',
+        description: 'Tọa độ kinh độ (Longitude)',
         example: 106.660172,
         minimum: -180,
         maximum: 180,
     })
     @IsOptional()
-    @IsNumber({}, { message: 'Toa do lng phai la so' })
-    @Min(-180, { message: 'Longitude phai trong khoang -180 den 180' })
-    @Max(180, { message: 'Longitude phai trong khoang -180 den 180' })
+    @IsNumber({}, { message: 'Tọa độ lng phải là số' })
+    @Min(-180, { message: 'Tọa độ lng phải trong khoảng -180 đến 180' })
+    @Max(180, { message: 'Tọa độ lng phải trong khoảng -180 đến 180' })
     @Type(() => Number)
     toa_do_lng?: number;
 
     @ApiPropertyOptional({
-        description: 'Expected arrival time (ISO DateTime)',
+        description: 'Thời gian đến dự kiến (ISO DateTime)',
         example: '2026-01-07T09:00:00',
     })
     @IsOptional()
-    @IsDateString({}, { message: 'Thoi gian den du kien phai la dinh dang ISO' })
+    @IsDateString({}, { message: 'Thời gian đến dự kiến phải là định dạng ISO' })
     thoi_gian_den_du_kien?: string;
 
     @ApiPropertyOptional({
-        description: 'Related job ID',
+        description: 'ID công việc liên quan',
     })
     @IsOptional()
-    @IsUUID('4', { message: 'ID cong viec phai la UUID hop le' })
+    @IsUUID('4', { message: 'ID công việc phải là UUID hợp lệ' })
     cong_viec_id?: string;
 
     @ApiPropertyOptional({
-        description: 'Notes for this stop',
+        description: 'Ghi chú cho điểm dừng này',
     })
     @IsOptional()
-    @IsString({ message: 'Ghi chu phai la chuoi' })
+    @IsString({ message: 'Ghi chú phải là chuỗi' })
     ghi_chu?: string;
 }
 
@@ -146,41 +146,41 @@ export class CreateDiemDungItemDto {
 // ============================================================
 
 /**
- * DTO to create a new route with stops
+ * DTO để tạo lộ trình mới với các điểm dừng
  */
 export class CreateLoTrinhDto {
     @ApiProperty({
-        description: 'Route date (YYYY-MM-DD)',
+        description: 'Ngày lộ trình (YYYY-MM-DD)',
         example: '2026-01-07',
     })
-    @IsNotEmpty({ message: 'Ngay lo trinh khong duoc de trong' })
-    @IsDateString({}, { message: 'Ngay lo trinh phai theo dinh dang YYYY-MM-DD' })
+    @IsNotEmpty({ message: 'Ngày lộ trình không được để trống' })
+    @IsDateString({}, { message: 'Ngày lộ trình phải theo định dạng YYYY-MM-DD' })
     ngay_lo_trinh: string;
 
     @ApiProperty({
-        description: 'Staff/Driver user ID',
+        description: 'ID nhân viên/lái xe',
         example: '550e8400-e29b-41d4-a716-446655440000',
     })
-    @IsNotEmpty({ message: 'ID nguoi dung khong duoc de trong' })
-    @IsUUID('4', { message: 'ID nguoi dung phai la UUID hop le' })
+    @IsNotEmpty({ message: 'ID người dùng không được để trống' })
+    @IsUUID('4', { message: 'ID người dùng phải là UUID hợp lệ' })
     nguoi_dung_id: string;
 
     @ApiProperty({
-        description: 'List of stops (must have at least 1)',
+        description: 'Danh sách điểm dừng (phải có ít nhất 1)',
         type: [CreateDiemDungItemDto],
     })
-    @IsNotEmpty({ message: 'Danh sach diem dung khong duoc de trong' })
-    @IsArray({ message: 'Stops phai la mang' })
-    @ArrayMinSize(1, { message: 'Phai co it nhat 1 diem dung' })
+    @IsNotEmpty({ message: 'Danh sách điểm dừng không được để trống' })
+    @IsArray({ message: 'Danh sách điểm dừng phải là mảng' })
+    @ArrayMinSize(1, { message: 'Phải có ít nhất 1 điểm dừng' })
     @ValidateNested({ each: true })
     @Type(() => CreateDiemDungItemDto)
     stops: CreateDiemDungItemDto[];
 
     @ApiPropertyOptional({
-        description: 'Notes for the route',
+        description: 'Ghi chú cho lộ trình',
     })
     @IsOptional()
-    @IsString({ message: 'Ghi chu phai la chuoi' })
+    @IsString({ message: 'Ghi chú phải là chuỗi' })
     ghi_chu?: string;
 }
 
@@ -189,11 +189,11 @@ export class CreateLoTrinhDto {
 // ============================================================
 
 /**
- * Query params for route list
+ * Tham số truy vấn danh sách lộ trình
  */
 export class QueryLoTrinhDto {
     @ApiPropertyOptional({
-        description: 'Page number',
+        description: 'Số trang',
         default: 1,
         minimum: 1,
     })
@@ -204,7 +204,7 @@ export class QueryLoTrinhDto {
     page?: number = 1;
 
     @ApiPropertyOptional({
-        description: 'Items per page',
+        description: 'Số items mỗi trang',
         default: 20,
         minimum: 1,
         maximum: 100,
@@ -216,22 +216,22 @@ export class QueryLoTrinhDto {
     limit?: number = 20;
 
     @ApiPropertyOptional({
-        description: 'Filter by date (YYYY-MM-DD)',
+        description: 'Lọc theo ngày (YYYY-MM-DD)',
         example: '2026-01-07',
     })
     @IsOptional()
-    @IsDateString({}, { message: 'Ngay phai theo dinh dang YYYY-MM-DD' })
+    @IsDateString({}, { message: 'Ngày phải theo định dạng YYYY-MM-DD' })
     ngay?: string;
 
     @ApiPropertyOptional({
-        description: 'Filter by staff user ID',
+        description: 'Lọc theo ID nhân viên',
     })
     @IsOptional()
-    @IsUUID('4', { message: 'ID nguoi dung phai la UUID hop le' })
+    @IsUUID('4', { message: 'ID người dùng phải là UUID hợp lệ' })
     nguoi_dung_id?: string;
 
     @ApiPropertyOptional({
-        description: 'Filter by status (0=Pending, 1=InProgress, 2=Completed, 3=Cancelled)',
+        description: 'Lọc theo trạng thái (0=Chưa bắt đầu, 1=Đang thực hiện, 2=Hoàn thành, 3=Đã hủy)',
     })
     @IsOptional()
     @Type(() => Number)
@@ -240,15 +240,15 @@ export class QueryLoTrinhDto {
 }
 
 /**
- * Query params for getMyRoute
+ * Tham số truy vấn cho getMyRoute
  */
 export class QueryMyRouteDto {
     @ApiPropertyOptional({
-        description: 'Date (YYYY-MM-DD). Defaults to today.',
+        description: 'Ngày (YYYY-MM-DD). Mặc định là hôm nay.',
         example: '2026-01-07',
     })
     @IsOptional()
-    @IsDateString({}, { message: 'Ngay phai theo dinh dang YYYY-MM-DD' })
+    @IsDateString({}, { message: 'Ngày phải theo định dạng YYYY-MM-DD' })
     ngay?: string;
 }
 
@@ -257,13 +257,13 @@ export class QueryMyRouteDto {
 // ============================================================
 
 /**
- * Embedded user info
+ * Thông tin người dùng nhúng
  */
 export class NguoiDungRouteDto {
     @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
     id: string;
 
-    @ApiProperty({ example: 'Nguyen Van A' })
+    @ApiProperty({ example: 'Nguyễn Văn A' })
     ho_ten: string;
 
     @ApiPropertyOptional({ example: 'nguyenvana@email.com' })
@@ -274,7 +274,7 @@ export class NguoiDungRouteDto {
 }
 
 /**
- * Embedded job info
+ * Thông tin công việc nhúng
  */
 export class CongViecRouteDto {
     @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -283,85 +283,85 @@ export class CongViecRouteDto {
     @ApiPropertyOptional({ example: 'CV-001' })
     ma_cong_viec?: string;
 
-    @ApiProperty({ example: 'Bao tri may lanh' })
+    @ApiProperty({ example: 'Bảo trì máy lạnh' })
     tieu_de: string;
 }
 
 /**
- * Response DTO for a stop
+ * DTO phản hồi cho điểm dừng
  */
 export class DiemDungResponseDto {
-    @ApiProperty({ description: 'Stop ID (UUID)' })
+    @ApiProperty({ description: 'ID điểm dừng (UUID)' })
     id: string;
 
-    @ApiProperty({ description: 'Stop order', example: 1 })
+    @ApiProperty({ description: 'Thứ tự điểm dừng', example: 1 })
     thu_tu: number;
 
-    @ApiPropertyOptional({ description: 'Address' })
+    @ApiPropertyOptional({ description: 'Địa chỉ' })
     dia_chi?: string;
 
-    @ApiPropertyOptional({ description: 'Latitude' })
+    @ApiPropertyOptional({ description: 'Tọa độ vĩ độ' })
     toa_do_lat?: number;
 
-    @ApiPropertyOptional({ description: 'Longitude' })
+    @ApiPropertyOptional({ description: 'Tọa độ kinh độ' })
     toa_do_lng?: number;
 
-    @ApiPropertyOptional({ description: 'Expected arrival time' })
+    @ApiPropertyOptional({ description: 'Thời gian đến dự kiến' })
     thoi_gian_den_du_kien?: Date;
 
-    @ApiPropertyOptional({ description: 'Actual arrival time' })
+    @ApiPropertyOptional({ description: 'Thời gian đến thực tế' })
     thoi_gian_den_thuc_te?: Date;
 
-    @ApiPropertyOptional({ description: 'Departure time' })
+    @ApiPropertyOptional({ description: 'Thời gian rời đi' })
     thoi_gian_roi_di?: Date;
 
-    @ApiProperty({ description: 'Status (0=Pending, 1=Visited, 2=Skipped)', example: 0 })
+    @ApiProperty({ description: 'Trạng thái (0=Chưa ghé thăm, 1=Đã ghé thăm, 2=Đã bỏ qua)', example: 0 })
     trang_thai: number;
 
-    @ApiPropertyOptional({ description: 'Notes' })
+    @ApiPropertyOptional({ description: 'Ghi chú' })
     ghi_chu?: string;
 
-    @ApiPropertyOptional({ description: 'Related job info', type: CongViecRouteDto })
+    @ApiPropertyOptional({ description: 'Thông tin công việc liên quan', type: CongViecRouteDto })
     cong_viec?: CongViecRouteDto;
 }
 
 /**
- * Response DTO for a route
+ * DTO phản hồi cho lộ trình
  */
 export class LoTrinhResponseDto {
-    @ApiProperty({ description: 'Route ID (UUID)' })
+    @ApiProperty({ description: 'ID lộ trình (UUID)' })
     id: string;
 
-    @ApiProperty({ description: 'Route date' })
+    @ApiProperty({ description: 'Ngày lộ trình' })
     ngay_lo_trinh: Date;
 
-    @ApiProperty({ description: 'Status (0=Pending, 1=InProgress, 2=Completed, 3=Cancelled)', example: 0 })
+    @ApiProperty({ description: 'Trạng thái (0=Chưa bắt đầu, 1=Đang thực hiện, 2=Hoàn thành, 3=Đã hủy)', example: 0 })
     trang_thai: number;
 
-    @ApiPropertyOptional({ description: 'Total distance (km)' })
+    @ApiPropertyOptional({ description: 'Tổng khoảng cách (km)' })
     tong_khoang_cach?: number;
 
-    @ApiPropertyOptional({ description: 'Start time' })
+    @ApiPropertyOptional({ description: 'Thời gian bắt đầu' })
     thoi_gian_bat_dau?: Date;
 
-    @ApiPropertyOptional({ description: 'End time' })
+    @ApiPropertyOptional({ description: 'Thời gian kết thúc' })
     thoi_gian_ket_thuc?: Date;
 
-    @ApiPropertyOptional({ description: 'Notes' })
+    @ApiPropertyOptional({ description: 'Ghi chú' })
     ghi_chu?: string;
 
-    @ApiProperty({ description: 'Staff info', type: NguoiDungRouteDto })
+    @ApiProperty({ description: 'Thông tin nhân viên', type: NguoiDungRouteDto })
     nguoi_dung: NguoiDungRouteDto;
 
-    @ApiProperty({ description: 'List of stops', type: [DiemDungResponseDto] })
+    @ApiProperty({ description: 'Danh sách điểm dừng', type: [DiemDungResponseDto] })
     diem_dung: DiemDungResponseDto[];
 
-    @ApiProperty({ description: 'Created date' })
+    @ApiProperty({ description: 'Ngày tạo' })
     ngay_tao: Date;
 }
 
 /**
- * Response for paginated route list
+ * Phản hồi cho danh sách lộ trình phân trang
  */
 export class LoTrinhListResponseDto {
     @ApiProperty({ type: [LoTrinhResponseDto] })
@@ -380,7 +380,7 @@ export class LoTrinhListResponseDto {
 }
 
 /**
- * Map status code to text
+ * Ánh xạ mã trạng thái thành text
  */
 export function mapTrangThaiLoTrinhToText(trangThai: number): string {
     const statusMap: Record<number, string> = {

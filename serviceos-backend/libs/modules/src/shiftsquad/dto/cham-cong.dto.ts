@@ -30,15 +30,15 @@ import { Transform, Type } from 'class-transformer';
 // ============================================================
 
 /**
- * Attendance status enum
+ * Enum trạng thái chấm công
  */
 export enum TrangThaiChamCong {
-    CHUA_CHECKIN = 0,    // Not checked in yet
-    DA_CHECKIN = 1,      // Checked in (working)
-    DA_CHECKOUT = 2,     // Checked out (completed day)
-    VANG_MAT = 3,        // Absent
-    TRE = 4,             // Late
-    VE_SOM = 5,          // Left early
+    CHUA_CHECKIN = 0,    // Chưa check-in
+    DA_CHECKIN = 1,      // Đã check-in (đang làm việc)
+    DA_CHECKOUT = 2,     // Đã check-out (hoàn thành ngày)
+    VANG_MAT = 3,        // Vắng mặt
+    TRE = 4,             // Trễ
+    VE_SOM = 5,          // Về sớm
 }
 
 // ============================================================
@@ -50,47 +50,47 @@ export enum TrangThaiChamCong {
  */
 export class CheckInDto {
     @ApiPropertyOptional({
-        description: 'Latitude coordinate for GPS tracking',
+        description: 'Tọa độ vĩ độ để theo dõi GPS',
         example: 10.762622,
         minimum: -90,
         maximum: 90,
     })
     @IsOptional()
-    @IsNumber({}, { message: 'Toa do lat phai la so' })
-    @Min(-90, { message: 'Latitude phai trong khoang -90 den 90' })
-    @Max(90, { message: 'Latitude phai trong khoang -90 den 90' })
+    @IsNumber({}, { message: 'Tọa độ lat phải là số' })
+    @Min(-90, { message: 'Tọa độ lat phải trong khoảng -90 đến 90' })
+    @Max(90, { message: 'Tọa độ lat phải trong khoảng -90 đến 90' })
     @Type(() => Number)
     toa_do_lat?: number;
 
     @ApiPropertyOptional({
-        description: 'Longitude coordinate for GPS tracking',
+        description: 'Tọa độ kinh độ để theo dõi GPS',
         example: 106.660172,
         minimum: -180,
         maximum: 180,
     })
     @IsOptional()
-    @IsNumber({}, { message: 'Toa do lng phai la so' })
-    @Min(-180, { message: 'Longitude phai trong khoang -180 den 180' })
-    @Max(180, { message: 'Longitude phai trong khoang -180 den 180' })
+    @IsNumber({}, { message: 'Tọa độ lng phải là số' })
+    @Min(-180, { message: 'Tọa độ lng phải trong khoảng -180 đến 180' })
+    @Max(180, { message: 'Tọa độ lng phải trong khoảng -180 đến 180' })
     @Type(() => Number)
     toa_do_lng?: number;
 
     @ApiPropertyOptional({
-        description: 'URL of check-in photo (selfie)',
+        description: 'URL ảnh check-in (selfie)',
         example: 'https://storage.example.com/checkin/photo-001.jpg',
         maxLength: 500,
     })
     @IsOptional()
-    @IsString({ message: 'URL anh checkin phai la chuoi' })
-    @MaxLength(500, { message: 'URL anh checkin toi da 500 ky tu' })
+    @IsString({ message: 'URL ảnh checkin phải là chuỗi' })
+    @MaxLength(500, { message: 'URL ảnh checkin tối đa 500 ký tự' })
     anh_checkin?: string;
 
     @ApiPropertyOptional({
-        description: 'Notes for check-in',
-        example: 'Check-in tai van phong chinh',
+        description: 'Ghi chú cho check-in',
+        example: 'Check-in tại văn phòng chính',
     })
     @IsOptional()
-    @IsString({ message: 'Ghi chu phai la chuoi' })
+    @IsString({ message: 'Ghi chú phải là chuỗi' })
     ghi_chu?: string;
 }
 
@@ -103,46 +103,46 @@ export class CheckInDto {
  */
 export class CheckOutDto {
     @ApiPropertyOptional({
-        description: 'Latitude coordinate for GPS tracking',
+        description: 'Tọa độ vĩ độ để theo dõi GPS',
         example: 10.762622,
         minimum: -90,
         maximum: 90,
     })
     @IsOptional()
-    @IsNumber({}, { message: 'Toa do lat phai la so' })
-    @Min(-90, { message: 'Latitude phai trong khoang -90 den 90' })
-    @Max(90, { message: 'Latitude phai trong khoang -90 den 90' })
+    @IsNumber({}, { message: 'Tọa độ lat phải là số' })
+    @Min(-90, { message: 'Tọa độ lat phải trong khoảng -90 đến 90' })
+    @Max(90, { message: 'Tọa độ lat phải trong khoảng -90 đến 90' })
     @Type(() => Number)
     toa_do_lat?: number;
 
     @ApiPropertyOptional({
-        description: 'Longitude coordinate for GPS tracking',
+        description: 'Tọa độ kinh độ để theo dõi GPS',
         example: 106.660172,
         minimum: -180,
         maximum: 180,
     })
     @IsOptional()
-    @IsNumber({}, { message: 'Toa do lng phai la so' })
-    @Min(-180, { message: 'Longitude phai trong khoang -180 den 180' })
-    @Max(180, { message: 'Longitude phai trong khoang -180 den 180' })
+    @IsNumber({}, { message: 'Tọa độ lng phải là số' })
+    @Min(-180, { message: 'Tọa độ lng phải trong khoảng -180 đến 180' })
+    @Max(180, { message: 'Tọa độ lng phải trong khoảng -180 đến 180' })
     @Type(() => Number)
     toa_do_lng?: number;
 
     @ApiPropertyOptional({
-        description: 'URL of check-out photo',
+        description: 'URL ảnh check-out',
         example: 'https://storage.example.com/checkout/photo-001.jpg',
         maxLength: 500,
     })
     @IsOptional()
-    @IsString({ message: 'URL anh checkout phai la chuoi' })
-    @MaxLength(500, { message: 'URL anh checkout toi da 500 ky tu' })
+    @IsString({ message: 'URL ảnh check-out phải là chuỗi' })
+    @MaxLength(500, { message: 'URL ảnh check-out tối đa 500 ký tự' })
     anh_checkout?: string;
 
     @ApiPropertyOptional({
-        description: 'Notes for check-out',
+        description: 'Ghi chú cho check-out',
     })
     @IsOptional()
-    @IsString({ message: 'Ghi chu phai la chuoi' })
+    @IsString({ message: 'Ghi chú phải là chuỗi' })
     ghi_chu?: string;
 }
 
@@ -155,29 +155,29 @@ export class CheckOutDto {
  */
 export class QueryTimesheetDto {
     @ApiProperty({
-        description: 'Month (1-12)',
+        description: 'Tháng (1-12)',
         example: 1,
         minimum: 1,
         maximum: 12,
     })
-    @IsNotEmpty({ message: 'Thang khong duoc de trong' })
+    @IsNotEmpty({ message: 'Tháng không được để trống' })
     @Type(() => Number)
-    @IsInt({ message: 'Thang phai la so nguyen' })
-    @Min(1, { message: 'Thang phai tu 1 den 12' })
-    @Max(12, { message: 'Thang phai tu 1 den 12' })
+    @IsInt({ message: 'Tháng phải là số nguyên' })
+    @Min(1, { message: 'Tháng phải từ 1 đến 12' })
+    @Max(12, { message: 'Tháng phải từ 1 đến 12' })
     thang: number;
 
     @ApiProperty({
-        description: 'Year',
+        description: 'Năm',
         example: 2026,
         minimum: 2020,
         maximum: 2100,
     })
-    @IsNotEmpty({ message: 'Nam khong duoc de trong' })
+    @IsNotEmpty({ message: 'Năm không được để trống' })
     @Type(() => Number)
-    @IsInt({ message: 'Nam phai la so nguyen' })
-    @Min(2020, { message: 'Nam phai tu 2020 tro len' })
-    @Max(2100, { message: 'Nam khong hop le' })
+    @IsInt({ message: 'Năm phải là số nguyên' })
+    @Min(2020, { message: 'Năm phải từ 2020 trở lên' })
+    @Max(2100, { message: 'Năm không hợp lệ' })
     nam: number;
 }
 
@@ -190,15 +190,15 @@ export class QueryTimesheetDto {
  */
 export class QueryDailyReportDto {
     @ApiProperty({
-        description: 'Date to report (YYYY-MM-DD)',
+        description: 'Ngày báo cáo (định dạng YYYY-MM-DD)',
         example: '2026-01-07',
     })
-    @IsNotEmpty({ message: 'Ngay bao cao khong duoc de trong' })
-    @IsDateString({}, { message: 'Ngay bao cao phai theo dinh dang YYYY-MM-DD' })
+    @IsNotEmpty({ message: 'Ngày báo cáo không được để trống' })
+    @IsDateString({}, { message: 'Ngày báo cáo phải theo định dạng YYYY-MM-DD' })
     ngay: string;
 
     @ApiPropertyOptional({
-        description: 'Page number',
+        description: 'Số trang',
         default: 1,
         minimum: 1,
     })
@@ -209,7 +209,7 @@ export class QueryDailyReportDto {
     page?: number = 1;
 
     @ApiPropertyOptional({
-        description: 'Items per page',
+        description: 'Số mục mỗi trang',
         default: 50,
         minimum: 1,
         maximum: 200,
@@ -255,7 +255,7 @@ export class ChamCongNguoiDungDto {
     @ApiPropertyOptional({ example: 'nguyenvana@email.com' })
     email?: string;
 
-    @ApiPropertyOptional({ example: 'Phong Ky Thuat' })
+    @ApiPropertyOptional({ example: 'Phòng Kỹ Thuật' })
     phong_ban?: string;
 }
 
@@ -263,61 +263,61 @@ export class ChamCongNguoiDungDto {
  * Response DTO for attendance record
  */
 export class ChamCongResponseDto {
-    @ApiProperty({ description: 'Record ID (UUID)' })
+    @ApiProperty({ description: 'ID bản ghi (UUID)' })
     id: string;
 
-    @ApiProperty({ description: 'User ID' })
+    @ApiProperty({ description: 'ID người dùng' })
     id_nguoi_dung: string;
 
-    @ApiPropertyOptional({ description: 'Shift ID' })
+    @ApiPropertyOptional({ description: 'ID ca làm việc' })
     id_ca_lam_viec?: string;
 
-    @ApiProperty({ description: 'Work date', example: '2026-01-07' })
+    @ApiProperty({ description: 'Ngày làm việc', example: '2026-01-07' })
     ngay_lam_viec: Date;
 
-    @ApiPropertyOptional({ description: 'Check-in time' })
+    @ApiPropertyOptional({ description: 'Thời gian check-in' })
     gio_checkin?: Date;
 
-    @ApiPropertyOptional({ description: 'Check-out time' })
+    @ApiPropertyOptional({ description: 'Thời gian check-out' })
     gio_checkout?: Date;
 
-    @ApiPropertyOptional({ description: 'Check-in latitude' })
+    @ApiPropertyOptional({ description: 'Vĩ độ check-in' })
     toa_do_checkin_lat?: number;
 
-    @ApiPropertyOptional({ description: 'Check-in longitude' })
+    @ApiPropertyOptional({ description: 'Kinh độ check-in' })
     toa_do_checkin_lng?: number;
 
-    @ApiPropertyOptional({ description: 'Check-out latitude' })
+    @ApiPropertyOptional({ description: 'Vĩ độ check-out' })
     toa_do_checkout_lat?: number;
 
-    @ApiPropertyOptional({ description: 'Check-out longitude' })
+    @ApiPropertyOptional({ description: 'Kinh độ check-out' })
     toa_do_checkout_lng?: number;
 
-    @ApiPropertyOptional({ description: 'Check-in photo URL' })
+    @ApiPropertyOptional({ description: 'URL ảnh check-in' })
     anh_checkin?: string;
 
-    @ApiPropertyOptional({ description: 'Check-out photo URL' })
+    @ApiPropertyOptional({ description: 'URL ảnh check-out' })
     anh_checkout?: string;
 
-    @ApiProperty({ description: 'Status', example: 1 })
+    @ApiProperty({ description: 'Trạng thái', example: 1 })
     trang_thai: number;
 
-    @ApiPropertyOptional({ description: 'Notes' })
+    @ApiPropertyOptional({ description: 'Ghi chú' })
     ghi_chu?: string;
 
-    @ApiPropertyOptional({ description: 'Working hours (calculated)', example: 8.5 })
+    @ApiPropertyOptional({ description: 'Số giờ làm việc (được tính toán)', example: 8.5 })
     so_gio_lam?: number;
 
-    @ApiPropertyOptional({ description: 'Shift info', type: CaLamViecEmbeddedDto })
+    @ApiPropertyOptional({ description: 'Thông tin ca làm việc', type: CaLamViecEmbeddedDto })
     ca_lam_viec?: CaLamViecEmbeddedDto;
 
-    @ApiPropertyOptional({ description: 'User info', type: ChamCongNguoiDungDto })
+    @ApiPropertyOptional({ description: 'Thông tin người dùng', type: ChamCongNguoiDungDto })
     nguoi_dung?: ChamCongNguoiDungDto;
 
-    @ApiProperty({ description: 'Created date' })
+    @ApiProperty({ description: 'Ngày tạo' })
     ngay_tao: Date;
 
-    @ApiProperty({ description: 'Updated date' })
+    @ApiProperty({ description: 'Ngày cập nhật' })
     ngay_cap_nhat: Date;
 }
 
@@ -325,16 +325,16 @@ export class ChamCongResponseDto {
  * Response for check-in confirmation
  */
 export class CheckInResponseDto {
-    @ApiProperty({ description: 'Success message', example: 'Check-in thanh cong' })
+    @ApiProperty({ description: 'Thông báo thành công', example: 'Check-in thanh cong' })
     message: string;
 
-    @ApiProperty({ description: 'Check-in time' })
+    @ApiProperty({ description: 'Thời gian check-in' })
     gio_checkin: Date;
 
-    @ApiPropertyOptional({ description: 'Shift applied', type: CaLamViecEmbeddedDto })
+    @ApiPropertyOptional({ description: 'Ca làm việc áp dụng', type: CaLamViecEmbeddedDto })
     ca_lam_viec?: CaLamViecEmbeddedDto;
 
-    @ApiProperty({ description: 'Attendance record', type: ChamCongResponseDto })
+    @ApiProperty({ description: 'Bản ghi chấm công', type: ChamCongResponseDto })
     data: ChamCongResponseDto;
 }
 
@@ -342,16 +342,16 @@ export class CheckInResponseDto {
  * Response for check-out confirmation
  */
 export class CheckOutResponseDto {
-    @ApiProperty({ description: 'Success message', example: 'Check-out thanh cong' })
+    @ApiProperty({ description: 'Thông báo thành công', example: 'Check-out thanh cong' })
     message: string;
 
-    @ApiProperty({ description: 'Check-out time' })
+    @ApiProperty({ description: 'Thời gian check-out' })
     gio_checkout: Date;
 
-    @ApiPropertyOptional({ description: 'Total working hours', example: 8.5 })
+    @ApiPropertyOptional({ description: 'Tổng số giờ làm việc', example: 8.5 })
     so_gio_lam?: number;
 
-    @ApiProperty({ description: 'Attendance record', type: ChamCongResponseDto })
+    @ApiProperty({ description: 'Bản ghi chấm công', type: ChamCongResponseDto })
     data: ChamCongResponseDto;
 }
 
@@ -363,7 +363,7 @@ export class TimesheetResponseDto {
     data: ChamCongResponseDto[];
 
     @ApiProperty({
-        description: 'Summary statistics',
+        description: 'Thống kê tổng hợp',
         example: {
             thang: 1,
             nam: 2026,
@@ -387,26 +387,26 @@ export class TimesheetResponseDto {
  * Employee status in daily report
  */
 export class EmployeeDailyStatusDto {
-    @ApiProperty({ description: 'User info', type: ChamCongNguoiDungDto })
+    @ApiProperty({ description: 'Thông tin người dùng', type: ChamCongNguoiDungDto })
     nguoi_dung: ChamCongNguoiDungDto;
 
     @ApiProperty({
-        description: 'Attendance status',
+        description: 'Trạng thái chấm công',
         enum: ['PRESENT', 'ABSENT', 'LATE', 'EARLY_LEAVE', 'NOT_CHECKED_IN'],
         example: 'PRESENT',
     })
     trang_thai_text: string;
 
-    @ApiPropertyOptional({ description: 'Check-in time' })
+    @ApiPropertyOptional({ description: 'Thời gian check-in' })
     gio_checkin?: Date;
 
-    @ApiPropertyOptional({ description: 'Check-out time' })
+    @ApiPropertyOptional({ description: 'Thời gian check-out' })
     gio_checkout?: Date;
 
-    @ApiPropertyOptional({ description: 'Working hours', example: 8.5 })
+    @ApiPropertyOptional({ description: 'Số giờ làm việc', example: 8.5 })
     so_gio_lam?: number;
 
-    @ApiPropertyOptional({ description: 'Shift info', type: CaLamViecEmbeddedDto })
+    @ApiPropertyOptional({ description: 'Thông tin ca làm việc', type: CaLamViecEmbeddedDto })
     ca_lam_viec?: CaLamViecEmbeddedDto;
 }
 
@@ -418,7 +418,7 @@ export class DailyReportResponseDto {
     data: EmployeeDailyStatusDto[];
 
     @ApiProperty({
-        description: 'Daily summary',
+        description: 'Tổng hợp hàng ngày',
         example: {
             ngay: '2026-01-07',
             tong_nhan_vien: 20,
@@ -436,7 +436,7 @@ export class DailyReportResponseDto {
     };
 
     @ApiProperty({
-        description: 'Pagination info',
+        description: 'Thông tin phân trang',
         example: { page: 1, limit: 50, total: 20, totalPages: 1 },
     })
     meta: {
@@ -452,8 +452,8 @@ export class DailyReportResponseDto {
 // ============================================================
 
 /**
- * Calculate working hours between check-in and check-out
- * Returns hours as decimal (e.g., 8.5 for 8 hours 30 minutes)
+ * Tính số giờ làm việc giữa check-in và check-out
+ * Trả về số giờ dưới dạng thập phân (ví dụ: 8.5 cho 8 giờ 30 phút)
  */
 export function calculateWorkingHours(checkin: Date, checkout: Date): number {
     const diffMs = checkout.getTime() - checkin.getTime();
@@ -462,7 +462,7 @@ export function calculateWorkingHours(checkin: Date, checkout: Date): number {
 }
 
 /**
- * Map numeric status to text
+ * Ánh xạ trạng thái số sang văn bản
  */
 export function mapStatusToText(status: TrangThaiChamCong): string {
     const statusMap: Record<TrangThaiChamCong, string> = {

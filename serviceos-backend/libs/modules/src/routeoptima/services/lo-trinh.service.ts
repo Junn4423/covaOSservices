@@ -407,7 +407,7 @@ export class LoTrinhService {
                 },
             });
             routeCompleted = true;
-            this.logger.log(`Route ${stop.id_lo_trinh} completed`);
+            this.logger.log(`Lộ trình ${stop.id_lo_trinh} đã hoàn thành`);
         } else if (stop.lo_trinh.trang_thai === TrangThaiLoTrinh.PENDING) {
             // Start route if first stop is being updated
             await this.prisma.loTrinh.update({
@@ -420,8 +420,8 @@ export class LoTrinhService {
             });
         }
 
-        const statusText = dto.trang_thai === TrangThaiDiemDung.VISITED ? 'Visited' : 'Skipped';
-        this.logger.log(`Stop ${diemDungId} marked as ${statusText}`);
+        const statusText = dto.trang_thai === TrangThaiDiemDung.VISITED ? 'Đã ghé thăm' : 'Đã bỏ qua';
+        this.logger.log(`Điểm dừng ${diemDungId} được đánh dấu là ${statusText}`);
 
         return {
             message: `Diem dung da duoc cap nhat thanh ${statusText}`,
@@ -450,7 +450,7 @@ export class LoTrinhService {
 
         if (route.trang_thai !== TrangThaiLoTrinh.PENDING) {
             throw new BadRequestException(
-                'Chi co the toi uu hoa lo trinh chua bat dau'
+                'Chỉ có thể tối ưu hóa lộ trình chưa bắt đầu'
             );
         }
 
@@ -480,12 +480,12 @@ export class LoTrinhService {
         // Fetch updated route
         const optimizedRoute = await this.findOne(idDoanhNghiep, loTrinhId);
 
-        this.logger.log(`Route ${loTrinhId} optimized (placeholder - TSP not implemented)`);
+        this.logger.log(`Lộ trình ${loTrinhId} đã được tối ưu hóa (placeholder - TSP chưa được triển khai)`);
 
         return {
-            message: 'Lo trinh da duoc toi uu hoa (placeholder)',
+            message: 'Lộ trình đã được tối ưu hóa (placeholder)',
             data: optimizedRoute,
-            note: 'TSP algorithm chua duoc implement. Hien tai chi sort theo thu_tu.',
+            note: 'TSP algorithm chưa được implement. Hiện tại chỉ sort theo thứ tự.',
         };
     }
 
@@ -509,7 +509,7 @@ export class LoTrinhService {
             include: this.includeRouteRelations,
         });
 
-        this.logger.log(`Route ${loTrinhId} started`);
+        this.logger.log(`Lộ trình ${loTrinhId} đã bắt đầu`);
         return this.transformRoute(updated);
     }
 
@@ -532,7 +532,7 @@ export class LoTrinhService {
             include: this.includeRouteRelations,
         });
 
-        this.logger.log(`Route ${loTrinhId} cancelled`);
+        this.logger.log(`Lộ trình ${loTrinhId} đã bị hủy`);
         return this.transformRoute(updated);
     }
 
@@ -557,7 +557,7 @@ export class LoTrinhService {
             }),
         ]);
 
-        this.logger.log(`Route ${loTrinhId} soft deleted`);
+        this.logger.log(`Lộ trình ${loTrinhId} đã bị xóa mềm`);
         return route;
     }
 }

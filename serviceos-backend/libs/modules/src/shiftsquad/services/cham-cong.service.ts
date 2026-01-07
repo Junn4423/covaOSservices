@@ -169,7 +169,7 @@ export class ChamCongService {
             // If check-in is more than 15 minutes after shift start, mark as late
             if (currentMinutes > shiftStartMinutes + 15) {
                 trangThai = TrangThaiChamCong.TRE;
-                this.logger.log(`User ${userId} checked in late`);
+                this.logger.log(`Nguoi dung ${userId} check-in tre`);
             }
         }
 
@@ -207,7 +207,7 @@ export class ChamCongService {
         }
 
         this.logger.log(
-            `User ${userId} checked in at ${now.toISOString()}, shift: ${currentShift?.ten_ca || 'None'}`
+            `Nguoi dung ${userId} check-in luc ${now.toISOString()}, ca: ${currentShift?.ten_ca || 'Khong co'}`
         );
 
         return {
@@ -278,7 +278,7 @@ export class ChamCongService {
             // If check-out is more than 15 minutes before shift end, mark as early leave
             if (currentMinutes < shiftEndMinutes - 15) {
                 trangThai = TrangThaiChamCong.VE_SOM;
-                this.logger.log(`User ${userId} left early`);
+                this.logger.log(`Nguoi dung ${userId} ve som`);
             }
         }
 
@@ -303,7 +303,7 @@ export class ChamCongService {
         );
 
         this.logger.log(
-            `User ${userId} checked out at ${now.toISOString()}, worked ${soGioLam} hours`
+            `Nguoi dung ${userId} check-out luc ${now.toISOString()}, lam viec ${soGioLam} gio`
         );
 
         return {
