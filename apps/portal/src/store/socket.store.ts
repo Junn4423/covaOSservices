@@ -14,12 +14,20 @@ import {
 } from "@/lib/socket";
 import type { NotificationEvent, AlertEvent, BroadcastEvent } from "@/lib/socket";
 
+// Callback type for toast notifications
+type ToastCallback = (notification: {
+  title: string;
+  description: string;
+  variant: "default" | "destructive";
+}) => void;
+
 interface SocketState {
   // State
   isConnected: boolean;
   connectionError: string | null;
   notifications: NotificationEvent[];
   unreadCount: number;
+  toastCallback: ToastCallback | null;
 
   // Actions
   connect: (token: string) => void;
@@ -28,6 +36,8 @@ interface SocketState {
   clearNotifications: () => void;
   setUnreadCount: (count: number) => void;
   sendTestNotification: (title?: string, message?: string) => void;
+  setToastCallback: (callback: ToastCallback | null) => void;
+  markNotificationRead: (id: string) => void;
 }
 
 export const useSocketStore = create<SocketState>((set, get) => ({
@@ -36,6 +46,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   connectionError: null,
   notifications: [],
   unreadCount: 0,
+  toastCallback: null,
+
+  // Set toast callback for showing notifications
+  setToastCallback: (callback) => set({ toastCallback: callback }),
 
   // Connect to WebSocket
   connect: (token: string) => {
@@ -47,7 +61,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("connected", (data) => {
-      console.log("[SocketStore] Authenticated:", data);
+      console.log("[SocketStore] Đã xác thực:", data);
     });
 
     socket.on("disconnect", () => {
@@ -60,10 +74,21 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     // Notification events
     socket.on("notification", (data: NotificationEvent) => {
+      const { toastCallback } = get();
+
       set((state) => ({
         notifications: [data, ...state.notifications].slice(0, 50), // Keep last 50
         unreadCount: state.unreadCount + 1,
       }));
+
+      // Show toast notification if callback is set
+      if (toastCallback) {
+        toastCallback({
+          title: data.tieuDe || "Thông báo mới",
+          description: data.noiDung || "",
+          variant: "default",
+        });
+      }
     });
 
     socket.on("notification:count", (data: { count: number }) => {
@@ -75,13 +100,15 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         notifications: state.notifications.map((n) =>
           n.id === data.notificationId ? { ...n, read: true } : n
         ),
+        unreadCount: Math.max(0, state.unreadCount - 1),
       }));
     });
 
     // Alert events
     socket.on("alert", (data: AlertEvent) => {
-      // Handle alert - could trigger a toast notification
-      console.log("[SocketStore] Alert received:", data);
+      const { toastCallback } = get();
+      console.log("[SocketStore] Cảnh báo nhận được:", data);
+
       set((state) => ({
         notifications: [
           {
@@ -94,11 +121,22 @@ export const useSocketStore = create<SocketState>((set, get) => ({
           ...state.notifications,
         ].slice(0, 50),
       }));
+
+      // Show toast for alerts
+      if (toastCallback) {
+        toastCallback({
+          title: data.title,
+          description: data.message,
+          variant: data.severity === "error" ? "destructive" : "default",
+        });
+      }
     });
 
     // Broadcast events
     socket.on("broadcast", (data: BroadcastEvent) => {
-      console.log("[SocketStore] Broadcast received:", data);
+      const { toastCallback } = get();
+      console.log("[SocketStore] Phát sóng nhận được:", data);
+
       set((state) => ({
         notifications: [
           {
@@ -111,6 +149,15 @@ export const useSocketStore = create<SocketState>((set, get) => ({
           ...state.notifications,
         ].slice(0, 50),
       }));
+
+      // Show toast for broadcasts
+      if (toastCallback) {
+        toastCallback({
+          title: data.title,
+          description: data.message,
+          variant: "default",
+        });
+      }
     });
 
     // Check initial connection status
@@ -141,8 +188,22 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     set({ unreadCount: count });
   },
 
+  // Mark notification as read
+  markNotificationRead: (id) => {
+    set((state) => ({
+      notifications: state.notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      ),
+      unreadCount: Math.max(0, state.unreadCount - 1),
+    }));
+  },
+
   // Send test notification
   sendTestNotification: (title?: string, message?: string) => {
-    socketSendTest(title, message);
+    socketSendTest(
+      title || "Thông báo thử nghiệm",
+      message || "Đây là thông báo thử nghiệm từ client."
+    );
   },
 }));
+

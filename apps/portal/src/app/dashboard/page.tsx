@@ -12,73 +12,74 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Welcome section */}
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">
-          Welcome back, {user?.ho_ten || "User"}!
+        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Xin chao, {user?.ho_ten || "Ban"}!
         </h2>
         <p className="text-muted-foreground mt-2">
-          Here is an overview of your ServiceOS Portal
+          Đây là tổng quan của ServiceOS Portal
         </p>
       </div>
 
       {/* Stats cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Connection Status</CardTitle>
+            <CardTitle className="text-sm font-medium">Trạng thái kết nối</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <div
-                className={`h-3 w-3 rounded-full ${
-                  isConnected ? "bg-green-500" : "bg-red-500"
-                }`}
+                className={`h-3 w-3 rounded-full transition-all duration-300 ${isConnected ? "bg-green-500 animate-pulse shadow-lg shadow-green-500/50" : "bg-red-500"
+                  }`}
               />
               <span className="text-2xl font-bold">
-                {isConnected ? "Online" : "Offline"}
+                {isConnected ? "Truc tuyen" : "Ngoai tuyen"}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              WebSocket {isConnected ? "connected" : "disconnected"}
+              WebSocket {isConnected ? "da ket noi" : "chua ket noi"}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notifications</CardTitle>
+            <CardTitle className="text-sm font-medium">Thong bao</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{unreadCount}</div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {unreadCount}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Unread notifications
+              Thông báo chưa đọc
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Role</CardTitle>
+            <CardTitle className="text-sm font-medium">Vai trò</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold capitalize">
+            <div className="text-2xl font-bold capitalize bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               {user?.vai_tro || "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">
-              Your account role
+              Vai trò tài khoản của bạn
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tenant</CardTitle>
+            <CardTitle className="text-sm font-medium">Doanh nghiệp</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold truncate">
+            <div className="text-2xl font-bold truncate bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
               {user?.doanh_nghiep?.ten_doanh_nghiep || "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">
-              Your organization
+              Tổ chức của bạn
             </p>
           </CardContent>
         </Card>
@@ -87,48 +88,72 @@ export default function DashboardPage() {
       {/* Feature cards */}
       <div className="grid gap-6 md:grid-cols-2">
         <Link href="/dashboard/storage">
-          <Card className="hover:border-primary transition-colors cursor-pointer h-full">
+          <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer h-full border-0 shadow-lg hover:scale-[1.02]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-100 text-blue-600 text-sm font-bold">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold shadow-lg">
                   S
                 </span>
-                Storage Demo
+                Quản lý Lưu trữ
               </CardTitle>
               <CardDescription>
-                Test file upload functionality with MinIO/S3 integration
+                Thử nghiệm chức năng tải lên tệp với MinIO/S3
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>- Upload images (JPEG, PNG, WebP)</li>
-                <li>- Upload documents (PDF, Word, Excel)</li>
-                <li>- View uploaded files with public URLs</li>
-                <li>- Delete files from storage</li>
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                  Tải lên hình ảnh (JPEG, PNG, WebP)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                  Tải lên tài liệu (PDF, Word, Excel)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                  Xem tệp đã tải lên với URL công khai
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                  Xóa tệp khỏi hệ thống lưu trữ
+                </li>
               </ul>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/realtime">
-          <Card className="hover:border-primary transition-colors cursor-pointer h-full">
+          <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer h-full border-0 shadow-lg hover:scale-[1.02]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded bg-green-100 text-green-600 text-sm font-bold">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-teal-600 text-white text-sm font-bold shadow-lg">
                   R
                 </span>
-                Real-time Demo
+                Thông báo Thời gian thực
               </CardTitle>
               <CardDescription>
-                Test WebSocket connection and live notifications
+                Thu nghiệm kết nối WebSocket và thông báo trực tiếp
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>- Send test notifications</li>
-                <li>- View real-time notification feed</li>
-                <li>- Monitor WebSocket connection status</li>
-                <li>- Test broadcast messages</li>
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                  Gửi thông báo thử nghiệm
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                  Xem danh sách thông báo thời gian thực
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                  Theo dõi trạng thái kết nối WebSocket
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                  Thử nghiệm tin nhắn phát sóng
+                </li>
               </ul>
             </CardContent>
           </Card>
@@ -136,24 +161,24 @@ export default function DashboardPage() {
       </div>
 
       {/* API Info */}
-      <Card>
+      <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>API Information</CardTitle>
+          <CardTitle>Thông tin API</CardTitle>
           <CardDescription>
-            Backend connection details
+            Chi tiết kết nối Backend
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
-            <div>
+            <div className="p-4 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
               <p className="text-sm font-medium">API URL</p>
-              <p className="text-sm text-muted-foreground font-mono">
+              <p className="text-sm text-muted-foreground font-mono mt-1">
                 {process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}
               </p>
             </div>
-            <div>
+            <div className="p-4 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
               <p className="text-sm font-medium">WebSocket URL</p>
-              <p className="text-sm text-muted-foreground font-mono">
+              <p className="text-sm text-muted-foreground font-mono mt-1">
                 {process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001"}
               </p>
             </div>

@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,15 +12,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuthStore } from "@/store";
 import { useToast } from "@/hooks/use-toast";
 
+// Zod validation schema
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Vui lòng nhập email")
+    .email("Email không hợp lệ"),
+  password: z
+    .string()
+    .min(1, "Vui lòng nhập mật khẩu")
+    .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+  tenant_code: z.string().optional(),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { login, isLoading, error, isAuthenticated, clearError } = useAuthStore();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    tenant_code: "",
+  // React Hook Form with Zod resolver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      tenant_code: "",
+    },
   });
 
   // Redirect if already authenticated
@@ -31,41 +57,25 @@ export default function LoginPage() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Login Failed",
-        description: error,
+        title: "Đăng nhập thất bại",
+        description: "Sai thông tin đăng nhập",
         variant: "destructive",
       });
       clearError();
     }
   }, [error, toast, clearError]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.email || !formData.password) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter email and password",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const onSubmit = async (data: LoginFormData) => {
     const success = await login({
-      email: formData.email,
-      password: formData.password,
-      tenant_code: formData.tenant_code || undefined,
+      email: data.email,
+      password: data.password,
+      tenant_code: data.tenant_code || undefined,
     });
 
     if (success) {
       toast({
-        title: "Login Successful",
-        description: "Welcome to ServiceOS!",
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn đến với ServiceOS!",
         variant: "default",
       });
       router.push("/dashboard");
@@ -74,72 +84,74 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">ServiceOS</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            ServiceOS
+          </CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            Đăng nhập vào tài khoản để tiếp tục
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="admin@example.com"
-                value={formData.email}
-                onChange={handleInputChange}
+                {...register("email")}
                 disabled={isLoading}
-                required
+                className={errors.email ? "border-red-500" : ""}
               />
+              {errors.email && (
+                <p className="text-xs text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleInputChange}
+                placeholder="Nhập mật khẩu của bạn"
+                {...register("password")}
                 disabled={isLoading}
-                required
+                className={errors.password ? "border-red-500" : ""}
               />
+              {errors.password && (
+                <p className="text-xs text-red-500">{errors.password.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenant_code">Tenant Code (Optional)</Label>
+              <Label htmlFor="tenant_code"> Mã doanh nghiệp (Tự chọn)</Label>
               <Input
                 id="tenant_code"
-                name="tenant_code"
                 type="text"
-                placeholder="e.g., DEMO"
-                value={formData.tenant_code}
-                onChange={handleInputChange}
+                placeholder="VD: DEMO"
+                {...register("tenant_code")}
                 disabled={isLoading}
               />
               <p className="text-xs text-muted-foreground">
-                Enter tenant code for multi-tenant login
+                Nhập mã doanh nghiệp nếu sử dụng chế độ multi-tenant
               </p>
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? "Đang xử lý..." : "Đăng nhập"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Demo credentials:</p>
+            <p>Tài khoản demo:</p>
             <p className="font-mono text-xs mt-1">
-              admin@demo.com / password123
+              admin@serviceos-demo.vn / Admin@123
             </p>
           </div>
         </CardContent>

@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AppGateway } from './gateways/app.gateway';
 import { RealtimeService } from './services/realtime.service';
+import { RealtimeController } from './controllers/realtime.controller';
 
 @Global() // Make RealtimeService available globally
 @Module({
@@ -22,7 +23,9 @@ import { RealtimeService } from './services/realtime.service';
             }),
         }),
     ],
+    controllers: [RealtimeController],
     providers: [AppGateway, RealtimeService],
     exports: [RealtimeService],
 })
-export class RealtimeModule {}
+export class RealtimeModule { }
+

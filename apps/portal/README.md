@@ -175,7 +175,7 @@ npm run lint
 
 After seeding the backend database:
 ```
-Email: admin@demo.com
-Password: password123
+Email: admin@serviceos-demo.vn
+Password: Admin@123
 Tenant Code: DEMO (optional)
 ```
