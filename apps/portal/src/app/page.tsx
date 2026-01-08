@@ -32,5 +32,5 @@ export default function HomePage() {
   }, [router]);
 
   // Show loader while checking auth
-  return <GlobalLoader message="Dang kiem tra dang nhap..." />;
+  return <GlobalLoader message="Đang kiểm tra đăng nhập..." />;
 }

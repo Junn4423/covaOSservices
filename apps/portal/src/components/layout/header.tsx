@@ -1,12 +1,13 @@
 /**
  * Header Component - ServiceOS Dashboard Header
+ * Su dung Design System mau sac moi
  * 
  * Features:
- * - Socket status indicator
- * - Notifications dropdown
- * - User avatar
- * - Mobile menu toggle
- * - Page title
+ * - Hien thi trang thai Socket (Xanh/Do)
+ * - Dropdown thong bao
+ * - Avatar nguoi dung
+ * - Nut menu mobile
+ * - Tieu de trang
  */
 
 "use client";
@@ -32,20 +33,20 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
-  // Get page title from route
+  // Lay tieu de trang tu route
   const getPageTitle = () => {
-    // Check modules
+    // Kiem tra modules
     const module = getModuleByHref(pathname);
     if (module) return module.label;
 
-    // Check quick access
+    // Kiem tra quick access
     const quickAccess = QUICK_ACCESS.find((q) => pathname === q.href);
     if (quickAccess) return quickAccess.label;
 
     return "Tong quan";
   };
 
-  // User initials
+  // Chu cai dau cua ten nguoi dung
   const userInitials =
     user?.ho_ten
       ?.split(" ")
@@ -54,7 +55,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       .toUpperCase()
       .slice(0, 2) || "U";
 
-  // Close notifications on outside click
+  // Dong dropdown khi click ra ngoai
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -70,67 +71,104 @@ export function Header({ onMenuClick }: HeaderProps) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 lg:px-8">
-      {/* Left Section */}
+    <header 
+      className="sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 lg:px-8"
+      style={{ 
+        backgroundColor: "var(--white)",
+        borderColor: "var(--gray-200)"
+      }}
+    >
+      {/* Phan ben trai */}
       <div className="flex items-center gap-4">
-        {/* Mobile Menu Button */}
+        {/* Nut Menu Mobile */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="lg:hidden p-2 rounded-lg transition-colors"
+          style={{ backgroundColor: "transparent" }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--gray-100)"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
         >
           <span className="sr-only">Mo menu</span>
           <div className="space-y-1.5">
-            <div className="h-0.5 w-6 bg-slate-600 dark:bg-slate-300" />
-            <div className="h-0.5 w-6 bg-slate-600 dark:bg-slate-300" />
-            <div className="h-0.5 w-6 bg-slate-600 dark:bg-slate-300" />
+            <div className="h-0.5 w-6" style={{ backgroundColor: "var(--gray-600)" }} />
+            <div className="h-0.5 w-6" style={{ backgroundColor: "var(--gray-600)" }} />
+            <div className="h-0.5 w-6" style={{ backgroundColor: "var(--gray-600)" }} />
           </div>
         </button>
 
-        {/* Page Title */}
+        {/* Tieu de trang */}
         <div>
-          <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
+          <h1 
+            className="text-lg font-semibold"
+            style={{ color: "var(--gray-900)" }}
+          >
             {getPageTitle()}
           </h1>
         </div>
       </div>
 
-      {/* Right Section */}
+      {/* Phan ben phai */}
       <div className="flex items-center gap-4">
-        {/* Socket Status */}
+        {/* Trang thai Socket */}
         <SocketStatusIndicator showLabel />
 
-        {/* Notifications */}
+        {/* Thong bao */}
         <div className="relative" ref={notificationRef}>
           <Button
             variant="ghost"
             size="sm"
-            className="relative h-9 w-9 p-0 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="relative h-9 w-9 p-0 rounded-lg"
+            style={{ backgroundColor: "transparent" }}
             onClick={() => setShowNotifications(!showNotifications)}
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium">
+            <span 
+              className="flex h-6 w-6 items-center justify-center rounded-lg text-xs font-medium"
+              style={{ backgroundColor: "var(--gray-100)", color: "var(--gray-600)" }}
+            >
               TB
             </span>
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+              <span 
+                className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium text-[var(--white)]"
+                style={{ backgroundColor: "var(--error)" }}
+              >
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
           </Button>
 
-          {/* Notifications Dropdown */}
+          {/* Dropdown Thong bao */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl z-50">
-              <div className="border-b border-slate-200 dark:border-slate-700 p-4">
-                <h3 className="font-semibold text-slate-900 dark:text-white">
+            <div 
+              className="absolute right-0 mt-2 w-80 rounded-xl border shadow-xl z-50"
+              style={{ 
+                backgroundColor: "var(--white)",
+                borderColor: "var(--gray-200)"
+              }}
+            >
+              <div 
+                className="border-b p-4"
+                style={{ borderColor: "var(--gray-200)" }}
+              >
+                <h3 
+                  className="font-semibold"
+                  style={{ color: "var(--gray-900)" }}
+                >
                   Thong bao
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p 
+                  className="text-xs"
+                  style={{ color: "var(--gray-500)" }}
+                >
                   Ban co {unreadCount} thong bao chua doc
                 </p>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <p className="p-6 text-sm text-slate-500 text-center">
+                  <p 
+                    className="p-6 text-sm text-center"
+                    style={{ color: "var(--gray-500)" }}
+                  >
                     Khong co thong bao nao
                   </p>
                 ) : (
@@ -138,26 +176,41 @@ export function Header({ onMenuClick }: HeaderProps) {
                     <div
                       key={notification.id}
                       className={cn(
-                        "border-b border-slate-100 dark:border-slate-800 p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer",
+                        "border-b p-4 transition-colors cursor-pointer",
                         !("read" in notification && notification.read) &&
-                        "bg-indigo-50/50 dark:bg-indigo-900/20"
+                        "bg-[var(--primary-blue)]/5"
                       )}
+                      style={{ 
+                        borderColor: "var(--gray-100)"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--gray-50)"}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = !("read" in notification && notification.read) ? "rgba(28, 110, 140, 0.05)" : "transparent"}
                     >
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      <p 
+                        className="text-sm font-medium"
+                        style={{ color: "var(--gray-900)" }}
+                      >
                         {notification.tieuDe}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                      <p 
+                        className="text-xs mt-1 line-clamp-2"
+                        style={{ color: "var(--gray-500)" }}
+                      >
                         {notification.noiDung}
                       </p>
                     </div>
                   ))
                 )}
               </div>
-              <div className="border-t border-slate-200 dark:border-slate-700 p-2">
+              <div 
+                className="border-t p-2"
+                style={{ borderColor: "var(--gray-200)" }}
+              >
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  className="w-full"
+                  style={{ color: "var(--primary-blue)" }}
                   onClick={() => {
                     setShowNotifications(false);
                     router.push("/dashboard/notifications");
@@ -170,10 +223,16 @@ export function Header({ onMenuClick }: HeaderProps) {
           )}
         </div>
 
-        {/* User Avatar */}
-        <Avatar className="h-9 w-9 border-2 border-slate-200 dark:border-slate-700">
+        {/* Avatar nguoi dung */}
+        <Avatar 
+          className="h-9 w-9 border-2"
+          style={{ borderColor: "var(--gray-200)" }}
+        >
           <AvatarImage src={user?.anh_dai_dien || ""} alt={user?.ho_ten || ""} />
-          <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm font-medium">
+          <AvatarFallback 
+            className="text-[var(--white)] text-sm font-medium"
+            style={{ backgroundColor: "var(--primary-dark)" }}
+          >
             {userInitials}
           </AvatarFallback>
         </Avatar>

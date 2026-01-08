@@ -1,13 +1,14 @@
 /**
- * TechMate - Jobs Page (Gold Standard Example)
+ * TechMate - Trang Cong viec (Vi du mau)
+ * Su dung Design System ServiceOS
  * 
  * Features:
- * - Data table with server-side pagination
- * - Search with debounce
+ * - Data table voi phan trang server-side
+ * - Tim kiem voi debounce
  * - Loading skeleton
- * - Error handling
- * - Empty state
- * - Vietnamese UI
+ * - Xu ly loi
+ * - Trang thai rong
+ * - Giao dien Tieng Viet
  */
 
 "use client";
@@ -46,25 +47,25 @@ interface Job {
 }
 
 // ============================================================================
-// STATUS & PRIORITY CONFIGS
+// CAU HINH TRANG THAI & UU TIEN (Su dung CSS Variables)
 // ============================================================================
 
 const STATUS_CONFIG = {
-    pending: { label: "Cho xu ly", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
-    in_progress: { label: "Dang xu ly", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
-    completed: { label: "Hoan thanh", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
-    cancelled: { label: "Da huy", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+    pending: { label: "Chờ xử lý", className: "badge-warning" },
+    in_progress: { label: "Đang xử lý", className: "badge-info" },
+    completed: { label: "Hoàn thành", className: "badge-success" },
+    cancelled: { label: "Đã hủy", className: "badge-error" },
 };
 
 const PRIORITY_CONFIG = {
-    low: { label: "Thap", color: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400" },
-    medium: { label: "Trung binh", color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" },
-    high: { label: "Cao", color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400" },
-    urgent: { label: "Khan cap", color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" },
+    low: { label: "Thấp", className: "bg-[var(--gray-100)] text-[var(--gray-600)]" },
+    medium: { label: "Trung bình", className: "badge-info" },
+    high: { label: "Cao", className: "badge-warning" },
+    urgent: { label: "Khẩn cấp", className: "badge-error" },
 };
 
 // ============================================================================
-// COLUMNS DEFINITION
+// DINH NGHIA COT
 // ============================================================================
 
 const columns: ColumnDef<Job>[] = [
@@ -72,7 +73,10 @@ const columns: ColumnDef<Job>[] = [
         accessorKey: "ma_cong_viec",
         header: "Ma CV",
         cell: ({ row }) => (
-            <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+            <span 
+                className="font-mono text-xs px-2 py-1 rounded"
+                style={{ backgroundColor: "var(--gray-100)", color: "var(--gray-700)" }}
+            >
                 {row.original.ma_cong_viec || "---"}
             </span>
         ),
@@ -82,11 +86,17 @@ const columns: ColumnDef<Job>[] = [
         header: "Tieu de",
         cell: ({ row }) => (
             <div>
-                <p className="font-medium text-slate-900 dark:text-white truncate max-w-xs">
+                <p 
+                    className="font-medium truncate max-w-xs"
+                    style={{ color: "var(--gray-900)" }}
+                >
                     {row.original.tieu_de}
                 </p>
                 {row.original.mo_ta && (
-                    <p className="text-xs text-slate-500 truncate max-w-xs mt-0.5">
+                    <p 
+                        className="text-xs truncate max-w-xs mt-0.5"
+                        style={{ color: "var(--gray-500)" }}
+                    >
                         {row.original.mo_ta}
                     </p>
                 )}
@@ -100,7 +110,7 @@ const columns: ColumnDef<Job>[] = [
             const status = row.original.trang_thai;
             const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
             return (
-                <span className={cn("px-2 py-1 rounded-full text-xs font-medium", config.color)}>
+                <span className={cn("px-2 py-1 rounded-full text-xs font-medium", config.className)}>
                     {config.label}
                 </span>
             );
@@ -113,7 +123,7 @@ const columns: ColumnDef<Job>[] = [
             const priority = row.original.do_uu_tien;
             const config = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.medium;
             return (
-                <span className={cn("px-2 py-1 rounded-full text-xs font-medium", config.color)}>
+                <span className={cn("px-2 py-1 rounded-full text-xs font-medium", config.className)}>
                     {config.label}
                 </span>
             );
@@ -123,7 +133,7 @@ const columns: ColumnDef<Job>[] = [
         accessorKey: "khach_hang",
         header: "Khach hang",
         cell: ({ row }) => (
-            <span className="text-slate-600 dark:text-slate-400">
+            <span style={{ color: "var(--gray-600)" }}>
                 {row.original.khach_hang?.ten_khach_hang || "---"}
             </span>
         ),
@@ -132,7 +142,7 @@ const columns: ColumnDef<Job>[] = [
         accessorKey: "nhan_vien",
         header: "Phu trach",
         cell: ({ row }) => (
-            <span className="text-slate-600 dark:text-slate-400">
+            <span style={{ color: "var(--gray-600)" }}>
                 {row.original.nhan_vien?.ho_ten || "Chua phan cong"}
             </span>
         ),
@@ -149,24 +159,43 @@ const columns: ColumnDef<Job>[] = [
 ];
 
 // ============================================================================
-// STATS CARDS
+// THE THONG KE
 // ============================================================================
 
 interface StatCardProps {
     title: string;
     value: number | string;
     description?: string;
-    color: string;
+    colorVar: string;
 }
 
-function StatCard({ title, value, description, color }: StatCardProps) {
+function StatCard({ title, value, colorVar }: StatCardProps) {
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+        <div 
+            className="rounded-xl border p-4"
+            style={{ 
+                backgroundColor: "var(--white)",
+                borderColor: "var(--gray-200)"
+            }}
+        >
             <div className="flex items-center gap-3">
-                <div className={cn("w-3 h-10 rounded-full", color)} />
+                <div 
+                    className="w-3 h-10 rounded-full"
+                    style={{ backgroundColor: colorVar }}
+                />
                 <div>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
-                    <p className="text-sm text-slate-500">{title}</p>
+                    <p 
+                        className="text-2xl font-bold"
+                        style={{ color: "var(--gray-900)" }}
+                    >
+                        {value}
+                    </p>
+                    <p 
+                        className="text-sm"
+                        style={{ color: "var(--gray-500)" }}
+                    >
+                        {title}
+                    </p>
                 </div>
             </div>
         </div>
@@ -174,19 +203,19 @@ function StatCard({ title, value, description, color }: StatCardProps) {
 }
 
 // ============================================================================
-// JOBS PAGE COMPONENT
+// TRANG CONG VIEC
 // ============================================================================
 
 export default function JobsPage() {
     const router = useRouter();
     const { toast } = useToast();
 
-    // Pagination & Search state
+    // State phan trang va tim kiem
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [search, setSearch] = useState("");
 
-    // Fetch jobs with TanStack Query
+    // Lay danh sach cong viec voi TanStack Query
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["jobs", { page, limit, search }],
         queryFn: async () => {
@@ -195,10 +224,10 @@ export default function JobsPage() {
             });
             return response.data;
         },
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        staleTime: 5 * 60 * 1000, // 5 phut
     });
 
-    // Pagination data
+    // Du lieu phan trang
     const pagination: DataTablePagination | undefined = data?.meta
         ? {
             page: data.meta.page,
@@ -208,37 +237,36 @@ export default function JobsPage() {
         }
         : undefined;
 
-    // Handlers
-    const handlePaginationChange = useCallback((newPage: number, newLimit: number) => {
+    // Xu ly su kien
+    const handlePaginationChange = useCallback((newPage: number) => {
         setPage(newPage);
     }, []);
 
     const handleSearchChange = useCallback((value: string) => {
         setSearch(value);
-        setPage(1); // Reset to first page on search
+        setPage(1); // Reset ve trang dau khi tim kiem
     }, []);
 
     const handleEdit = useCallback((job: Job) => {
         toast({
-            title: "Chinh sua cong viec",
-            description: `Dang mo chinh sua: ${job.tieu_de}`,
+            title: "Chỉnh sửa công việc",
+            description: `Đang mở chỉnh sửa: ${job.tieu_de}`,
         });
-        // router.push(`/dashboard/jobs/${job.id}/edit`);
     }, [toast]);
 
     const handleDelete = useCallback((job: Job) => {
         toast({
-            title: "Xoa cong viec",
-            description: `Xac nhan xoa: ${job.tieu_de}?`,
+            title: "Xóa công việc",
+            description: `Xác nhận xóa: ${job.tieu_de}?`,
             variant: "destructive",
         });
     }, [toast]);
 
-    const handleRowClick = useCallback((job: Job) => {
+    const handleRowClick = useCallback(() => {
         // router.push(`/dashboard/jobs/${job.id}`);
     }, []);
 
-    // Calculate stats from data (or use API if available)
+    // Tinh toan thong ke tu du lieu
     const stats = useMemo(() => {
         if (!data?.data) return { pending: 0, inProgress: 0, completed: 0, total: 0 };
 
@@ -251,20 +279,29 @@ export default function JobsPage() {
         };
     }, [data]);
 
-    // Error state
+    // Trang thai loi
     if (isError) {
         return (
             <Card>
                 <CardContent className="py-12 text-center">
-                    <div className="text-red-500 mb-4">[!]</div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                        Loi tai du lieu
+                    <div style={{ color: "var(--error)" }} className="mb-4 text-4xl">[!]</div>
+                    <h3 
+                        className="text-lg font-semibold mb-2"
+                        style={{ color: "var(--gray-900)" }}
+                    >
+                        lỗi tải dữ liệu
                     </h3>
-                    <p className="text-slate-500 mb-4">
+                    <p 
+                        className="mb-4"
+                        style={{ color: "var(--gray-500)" }}
+                    >
                         {(error as Error)?.message || "Khong the tai danh sach cong viec"}
                     </p>
-                    <Button onClick={() => window.location.reload()}>
-                        Thu lai
+                    <Button 
+                        onClick={() => window.location.reload()}
+                        style={{ backgroundColor: "var(--primary-dark)" }}
+                    >
+                        Thử lại
                     </Button>
                 </CardContent>
             </Card>
@@ -273,54 +310,63 @@ export default function JobsPage() {
 
     return (
         <div className="space-y-6">
-            {/* Page Header */}
+            {/* Tieu de trang */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                        Quan ly cong viec
+                    <h1 
+                        className="text-2xl font-bold"
+                        style={{ color: "var(--gray-900)" }}
+                    >
+                        Quản lý công việc
                     </h1>
-                    <p className="text-slate-500 mt-1">
-                        TechMate - Tao, phan cong va theo doi cong viec
+                    <p 
+                        className="mt-1"
+                        style={{ color: "var(--gray-500)" }}
+                    >
+                        TechMate - Tạo, phân công và theo dõi công việc
                     </p>
                 </div>
                 <Button
-                    onClick={() => toast({ title: "Tao cong viec moi", description: "Tinh nang dang phat trien" })}
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                    onClick={() => toast({ title: "Tạo công việc mới", description: "Tính năng đang phát triển" })}
+                    style={{ 
+                        backgroundColor: "var(--primary-dark)",
+                        boxShadow: "0 4px 14px rgba(18, 78, 102, 0.25)"
+                    }}
                 >
-                    + Tao cong viec
+                    + Tạo công việc
                 </Button>
             </div>
 
-            {/* Stats Cards */}
+            {/* Thẻ thống kê */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
-                    title="Tong cong viec"
+                    title="Tổng công việc"
                     value={stats.total}
-                    color="bg-indigo-500"
+                    colorVar="var(--primary-dark)"
                 />
                 <StatCard
-                    title="Cho xu ly"
+                    title="Chờ xử lý"
                     value={stats.pending}
-                    color="bg-amber-500"
+                    colorVar="var(--warning)"
                 />
                 <StatCard
-                    title="Dang xu ly"
+                    title="Đang xử lý"
                     value={stats.inProgress}
-                    color="bg-blue-500"
+                    colorVar="var(--primary-blue)"
                 />
                 <StatCard
-                    title="Hoan thanh"
+                    title="Hoàn thành"
                     value={stats.completed}
-                    color="bg-emerald-500"
+                    colorVar="var(--primary-green)"
                 />
             </div>
 
-            {/* Data Table */}
+            {/* Bang du lieu */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Danh sach cong viec</CardTitle>
+                    <CardTitle>Danh sách công việc</CardTitle>
                     <CardDescription>
-                        Quan ly tat ca cong viec cua doanh nghiep
+                        Quản lý tất cả công việc của doanh nghiệp
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

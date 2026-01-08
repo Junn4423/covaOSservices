@@ -1,6 +1,7 @@
 /**
  * SocketStatusIndicator Component
- * Shows connection status in header (Green=Connected, Red=Disconnected)
+ * Hien thi trang thai ket noi Socket tren Header
+ * Su dung mau sac tu Design System
  */
 
 "use client";
@@ -21,28 +22,24 @@ export function SocketStatusIndicator({
 
     const statusConfig = {
         connected: {
-            color: "bg-emerald-500",
-            pulse: "bg-emerald-400",
+            dotClass: "socket-connected",
             label: "Da ket noi",
-            ring: "ring-emerald-500/30",
+            ringClass: "ring-[var(--primary-green)]/30",
         },
         connecting: {
-            color: "bg-amber-500",
-            pulse: "bg-amber-400",
+            dotClass: "bg-[var(--warning)]",
             label: "Dang ket noi...",
-            ring: "ring-amber-500/30",
+            ringClass: "ring-[var(--warning)]/30",
         },
         disconnected: {
-            color: "bg-red-500",
-            pulse: "bg-red-400",
+            dotClass: "socket-disconnected",
             label: "Mat ket noi",
-            ring: "ring-red-500/30",
+            ringClass: "ring-[var(--gray-500)]/30",
         },
         error: {
-            color: "bg-red-500",
-            pulse: "bg-red-400",
+            dotClass: "socket-error",
             label: "Loi ket noi",
-            ring: "ring-red-500/30",
+            ringClass: "ring-[var(--error)]/30",
         },
     };
 
@@ -55,16 +52,16 @@ export function SocketStatusIndicator({
                 <div
                     className={cn(
                         "w-2.5 h-2.5 rounded-full ring-4",
-                        config.color,
-                        config.ring
+                        config.dotClass,
+                        config.ringClass
                     )}
                 />
-                {/* Pulse animation for connected/connecting */}
+                {/* Pulse animation khi dang ket noi */}
                 {(status === "connected" || status === "connecting") && (
                     <div
                         className={cn(
                             "absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-75",
-                            config.pulse
+                            config.dotClass
                         )}
                     />
                 )}
@@ -72,7 +69,7 @@ export function SocketStatusIndicator({
 
             {/* Label */}
             {showLabel && (
-                <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
+                <span className="text-xs text-[var(--gray-600)] hidden sm:inline">
                     {config.label}
                 </span>
             )}

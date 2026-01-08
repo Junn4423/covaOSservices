@@ -202,16 +202,19 @@ httpClient.interceptors.response.use(
                 // Call refresh endpoint
                 const response = await axios.post(
                     `${API_URL}/auth/refresh`,
-                    { refreshToken },
+                    { refresh_token: refreshToken },
                     { withCredentials: true }
                 );
 
-                const { accessToken, refreshToken: newRefreshToken } = response.data;
+                const { accessToken, refreshToken: newRefreshToken, access_token, refresh_token } =
+                    response.data as Record<string, any>;
 
-                // Store new tokens
-                TokenService.setAccessToken(accessToken);
-                if (newRefreshToken) {
-                    TokenService.setRefreshToken(newRefreshToken);
+                const access = accessToken ?? access_token;
+                const nextRefresh = newRefreshToken ?? refresh_token;
+
+                TokenService.setAccessToken(access);
+                if (nextRefresh) {
+                    TokenService.setRefreshToken(nextRefresh);
                 }
 
                 // Notify queued requests

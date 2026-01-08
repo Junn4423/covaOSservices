@@ -2,59 +2,193 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-  }
+/* ============================================================================
+   ServiceOS Design System - CSS Variables
+   ============================================================================ */
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-  }
+:root {
+  /* Primary Colors */
+  --primary-dark: #124E66;
+  --primary-green: #2E8B57;
+  --primary-blue: #1C6E8C;
+  --primary-navy: #0D1B2A;
+  --primary-light: #E6EBEE;
+  --accent-green: #A5B452;
+  
+  /* Base Colors */
+  --white: #ffffff;
+  --black: #000000;
+  
+  /* Gray Scale */
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-300: #dee2e6;
+  --gray-400: #ced4da;
+  --gray-500: #adb5bd;
+  --gray-600: #6c757d;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+  
+  /* Semantic Colors */
+  --success: #2E8B57;
+  --warning: #F59E0B;
+  --error: #DC2626;
+  --info: #1C6E8C;
+  
+  /* Shadcn/Radix Compatible Variables */
+  --background: 0 0% 100%;
+  --foreground: 210 11% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 11% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 11% 15%;
+  --primary: 195 70% 24%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 20% 93%;
+  --secondary-foreground: 210 11% 15%;
+  --muted: 210 20% 93%;
+  --muted-foreground: 215 14% 45%;
+  --accent: 74 38% 51%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 195 70% 24%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 206 47% 7%;
+  --foreground: 210 20% 93%;
+  --card: 206 47% 10%;
+  --card-foreground: 210 20% 93%;
+  --popover: 206 47% 10%;
+  --popover-foreground: 210 20% 93%;
+  --primary: 195 70% 33%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 206 40% 15%;
+  --secondary-foreground: 210 20% 93%;
+  --muted: 206 40% 15%;
+  --muted-foreground: 215 14% 65%;
+  --accent: 74 38% 51%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 62% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 206 40% 20%;
+  --input: 206 40% 20%;
+  --ring: 195 70% 33%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Focus ring với màu chủ đạo */
+  :focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Button Variants */
+  .btn-primary {
+    background-color: var(--primary-dark);
+    color: var(--white);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-blue);
+  }
+  
+  .btn-success {
+    background-color: var(--primary-green);
+    color: var(--white);
+  }
+  
+  .btn-success:hover {
+    background-color: var(--accent-green);
+  }
+  
+  /* Card với shadow tinh tế */
+  .card-elevated {
+    background-color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Sidebar styling */
+  .sidebar-nav {
+    background-color: var(--primary-navy);
+    color: var(--white);
+  }
+  
+  .sidebar-nav-item {
+    color: var(--gray-300);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-nav-item:hover,
+  .sidebar-nav-item.active {
+    background-color: var(--primary-blue);
+    color: var(--white);
+  }
+  
+  /* Socket status indicators */
+  .socket-connected {
+    background-color: var(--primary-green);
+  }
+  
+  .socket-disconnected {
+    background-color: var(--gray-500);
+  }
+  
+  .socket-error {
+    background-color: var(--error);
+  }
+  
+  /* Toast variants */
+  .toast-success {
+    border-left: 4px solid var(--accent-green);
+    background-color: var(--white);
+  }
+  
+  .toast-error {
+    border-left: 4px solid var(--error);
+    background-color: var(--white);
+  }
+  
+  .toast-info {
+    border-left: 4px solid var(--primary-blue);
+    background-color: var(--white);
+  }
+  
+  /* Badge variants */
+  .badge-success {
+    background-color: rgba(46, 139, 87, 0.1);
+    color: var(--primary-green);
+  }
+  
+  .badge-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+  
+  .badge-error {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: var(--error);
+  }
+  
+  .badge-info {
+    background-color: rgba(28, 110, 140, 0.1);
+    color: var(--primary-blue);
   }
 }

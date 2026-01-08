@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "ServiceOS Portal",
-  description: "Nen tang quan ly dich vu doanh nghiep da doi tuong",
+  description: "Nền tảng quản lý dịch vụ doanh nghiệp đa đối tượng",
   keywords: ["ServiceOS", "SaaS", "Multi-tenant", "Enterprise", "Service Management"],
   authors: [{ name: "ServiceOS Team" }],
 };

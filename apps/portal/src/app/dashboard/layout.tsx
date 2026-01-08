@@ -1,12 +1,13 @@
 /**
  * Dashboard Layout - Production Ready
+ * Su dung Design System ServiceOS
  * 
  * Features:
- * - Auth initialization before render (prevents flash)
- * - Socket connection coordinated with auth
- * - Responsive layout with collapsible sidebar
- * - Error boundary protection
- * - Toast integration for socket events
+ * - Khoi tao Auth truoc khi render (tranh flash)
+ * - Ket noi Socket dong bo voi Auth
+ * - Layout responsive voi sidebar co the dong mo
+ * - Bao ve bang Error boundary
+ * - Tich hop Toast cho cac su kien socket
  */
 
 "use client";
@@ -18,7 +19,6 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { GlobalLoader } from "@/components/common";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -27,13 +27,13 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const { isAuthenticated, isInitialized, user } = useAuthStore();
+  const { isAuthenticated, isInitialized } = useAuthStore();
   const { setToastCallback } = useSocketStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // ========================================
-  // Initialize Auth (CRITICAL - runs first)
+  // Khoi tao Auth (QUAN TRONG - chay truoc)
   // ========================================
   useEffect(() => {
     const checkAuth = async () => {
@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [router]);
 
   // ========================================
-  // Setup Toast Callback for Socket Events
+  // Thiet lap Toast Callback cho Socket Events
   // ========================================
   const handleToast = useCallback(
     (notification: { title: string; description: string; variant: "default" | "destructive" }) => {
@@ -72,7 +72,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [handleToast, setToastCallback]);
 
   // ========================================
-  // Redirect if not authenticated after init
+  // Chuyen huong neu chua xac thuc sau khi init
   // ========================================
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
@@ -81,46 +81,52 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [isInitialized, isAuthenticated, router]);
 
   // ========================================
-  // Loading State
+  // Trang thai Loading
   // ========================================
   if (isCheckingAuth || !isInitialized) {
-    return <GlobalLoader message="Đang xác thực..." />;
+    return <GlobalLoader message="Dang xac thuc..." />;
   }
 
   // ========================================
-  // Not Authenticated - Redirect handled above
+  // Chua xac thuc - Chuyen huong xu ly o tren
   // ========================================
   if (!isAuthenticated) {
-    return <GlobalLoader message="Đang chuyển hướng..." />;
+    return <GlobalLoader message="Dang chuyen huong..." />;
   }
 
   // ========================================
   // Render Layout
   // ========================================
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div 
+      className="min-h-screen"
+      style={{ backgroundColor: "var(--gray-100)" }}
+    >
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main Content Area */}
+      {/* Vung noi dung chinh */}
       <div className="lg:pl-72">
         {/* Header */}
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
-        {/* Main Content */}
+        {/* Noi dung chinh */}
         <main className="p-4 lg:p-6">
-          {/* Content Container */}
+          {/* Container noi dung */}
           <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-slate-200 dark:border-slate-700 p-4 text-center">
-          <p className="text-xs text-slate-500">
+        <footer 
+          className="border-t p-4 text-center"
+          style={{ borderColor: "var(--gray-200)" }}
+        >
+          <p className="text-xs" style={{ color: "var(--gray-500)" }}>
             ServiceOS v1.0 - Nền tảng quản lý dịch vụ doanh nghiệp
           </p>
         </footer>

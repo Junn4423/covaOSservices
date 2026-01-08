@@ -1,6 +1,6 @@
 /**
- * Dashboard Home Page
- * Overview with stats and quick access
+ * Trang Dashboard - Tong quan
+ * Su dung Design System ServiceOS
  */
 
 "use client";
@@ -9,36 +9,38 @@ import { useAuthStore } from "@/stores";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MODULES } from "@/config";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 // ============================================================================
-// STAT CARD COMPONENT
+// THE THONG KE
 // ============================================================================
 
 interface StatCardProps {
   title: string;
   value: string | number;
   description: string;
-  color: string;
+  colorVar: string;
 }
 
-function StatCard({ title, value, description, color }: StatCardProps) {
+function StatCard({ title, value, description, colorVar }: StatCardProps) {
   return (
     <Card className="relative overflow-hidden">
-      <div className={cn("absolute top-0 left-0 w-1 h-full", color)} />
+      <div 
+        className="absolute top-0 left-0 w-1 h-full"
+        style={{ backgroundColor: colorVar }}
+      />
       <CardHeader className="pb-2">
         <CardDescription>{title}</CardDescription>
         <CardTitle className="text-3xl font-bold">{value}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <p className="text-xs" style={{ color: "var(--gray-500)" }}>{description}</p>
       </CardContent>
     </Card>
   );
 }
 
 // ============================================================================
-// MODULE CARD COMPONENT
+// THE MODULE
 // ============================================================================
 
 interface ModuleCardProps {
@@ -52,20 +54,26 @@ interface ModuleCardProps {
 function ModuleCard({ href, iconLetter, label, description, color }: ModuleCardProps) {
   return (
     <Link href={href}>
-      <Card className="group h-full hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer">
+      <Card className="group h-full hover:shadow-lg transition-all cursor-pointer border-[var(--gray-200)] hover:border-[var(--primary-blue)]">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white font-bold text-lg shadow-lg transition-transform group-hover:scale-110"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--white)] font-bold text-lg shadow-lg transition-transform group-hover:scale-110"
               style={{ backgroundColor: color }}
             >
               {iconLetter}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <h3 
+                className="font-semibold group-hover:text-[var(--primary-blue)] transition-colors"
+                style={{ color: "var(--gray-900)" }}
+              >
                 {label}
               </h3>
-              <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+              <p 
+                className="text-sm mt-1 line-clamp-2"
+                style={{ color: "var(--gray-500)" }}
+              >
                 {description}
               </p>
             </div>
@@ -77,65 +85,73 @@ function ModuleCard({ href, iconLetter, label, description, color }: ModuleCardP
 }
 
 // ============================================================================
-// DASHBOARD PAGE
+// TRANG DASHBOARD
 // ============================================================================
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
 
-  // Get greeting based on time
+  // Lay loi chao theo thoi gian
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Chao buoi sang";
-    if (hour < 18) return "Chao buoi chieu";
-    return "Chao buoi toi";
+    if (hour < 12) return "Chào buổi sáng";
+    if (hour < 18) return "Chào buổi chiều";
+    return "Chào buổi tối";
   };
 
   return (
     <div className="space-y-8">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-white">
-        <p className="text-indigo-200">{getGreeting()},</p>
+      {/* Phan chao mung */}
+      <div 
+        className="rounded-2xl p-8 text-[var(--white)]"
+        style={{ 
+          background: "linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%)"
+        }}
+      >
+        <p style={{ color: "var(--primary-light)" }}>{getGreeting()},</p>
         <h1 className="text-3xl font-bold mt-1">
           {user?.ho_ten || "Nguoi dung"}
         </h1>
-        <p className="text-indigo-100 mt-2">
-          Chao mung ban quay tro lai voi ServiceOS
+        <p style={{ color: "var(--primary-light)" }} className="mt-2">
+          Chào mừng bạn quay trở lại với ServiceOS
         </p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Luoi thong ke */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Cong viec hom nay"
+          title="Công việc hôm nay"
           value="12"
-          description="Tang 8% so voi hom qua"
-          color="bg-indigo-500"
+          description="Tăng 8% so với hôm qua"
+          colorVar="var(--primary-dark)"
         />
         <StatCard
-          title="Khach hang moi"
+          title="Khách hàng mới"
           value="24"
-          description="Tuan nay"
-          color="bg-emerald-500"
+          description="Tuần này"
+          colorVar="var(--primary-green)"
         />
         <StatCard
           title="Doanh thu"
           value="45.2M"
-          description="Thang nay"
-          color="bg-amber-500"
+          description="Tháng này"
+          colorVar="var(--warning)"
         />
         <StatCard
-          title="Nhan vien hoat dong"
+          title="Nhân viên hoạt động"
           value="18"
-          description="Dang truc tuyen"
-          color="bg-purple-500"
+          description="Đang trực tuyến"
+          colorVar="var(--primary-blue)"
         />
       </div>
 
-      {/* Modules Grid */}
+      {/* Luoi Module */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-          Cac module he thong
+        <h2 
+          className="text-xl font-bold mb-4"
+          style={{ color: "var(--gray-900)" }}
+        >
+          Các phân hệ
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {MODULES.map((module) => (
@@ -151,54 +167,109 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Hanh dong nhanh */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-          Hanh dong nhanh
+        <h2 
+          className="text-xl font-bold mb-4"
+          style={{ color: "var(--gray-900)" }}
+        >
+          Hành động nhanh
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             href="/dashboard/jobs"
-            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+            className="flex flex-col items-center justify-center p-6 rounded-xl border transition-colors"
+            style={{ 
+              backgroundColor: "var(--white)",
+              borderColor: "var(--gray-200)"
+            }}
           >
-            <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xl mb-3">
+            <div 
+              className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl mb-3"
+              style={{ 
+                backgroundColor: "rgba(18, 78, 102, 0.1)",
+                color: "var(--primary-dark)"
+              }}
+            >
               +
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Tao cong viec
+            <span 
+              className="text-sm font-medium"
+              style={{ color: "var(--gray-700)" }}
+            >
+              Tạo công việc
             </span>
           </Link>
           <Link
             href="/dashboard/customers"
-            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+            className="flex flex-col items-center justify-center p-6 rounded-xl border transition-colors"
+            style={{ 
+              backgroundColor: "var(--white)",
+              borderColor: "var(--gray-200)"
+            }}
           >
-            <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xl mb-3">
+            <div 
+              className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl mb-3"
+              style={{ 
+                backgroundColor: "rgba(46, 139, 87, 0.1)",
+                color: "var(--primary-green)"
+              }}
+            >
               +
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Them khach hang
+            <span 
+              className="text-sm font-medium"
+              style={{ color: "var(--gray-700)" }}
+            >
+              Thêm khách hàng
             </span>
           </Link>
           <Link
             href="/dashboard/quotes"
-            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+            className="flex flex-col items-center justify-center p-6 rounded-xl border transition-colors"
+            style={{ 
+              backgroundColor: "var(--white)",
+              borderColor: "var(--gray-200)"
+            }}
           >
-            <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xl mb-3">
+            <div 
+              className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl mb-3"
+              style={{ 
+                backgroundColor: "rgba(245, 158, 11, 0.1)",
+                color: "var(--warning)"
+              }}
+            >
               +
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Tao bao gia
+            <span 
+              className="text-sm font-medium"
+              style={{ color: "var(--gray-700)" }}
+            >
+              Tạo báo giá
             </span>
           </Link>
           <Link
             href="/dashboard/inventory"
-            className="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+            className="flex flex-col items-center justify-center p-6 rounded-xl border transition-colors"
+            style={{ 
+              backgroundColor: "var(--white)",
+              borderColor: "var(--gray-200)"
+            }}
           >
-            <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xl mb-3">
+            <div 
+              className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl mb-3"
+              style={{ 
+                backgroundColor: "rgba(28, 110, 140, 0.1)",
+                color: "var(--primary-blue)"
+              }}
+            >
               +
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Nhap kho
+            <span 
+              className="text-sm font-medium"
+              style={{ color: "var(--gray-700)" }}
+            >
+              Nhập kho
             </span>
           </Link>
         </div>

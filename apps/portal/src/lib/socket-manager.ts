@@ -100,7 +100,7 @@ class SocketManager {
     public async connect(token: string): Promise<boolean> {
         // Prevent duplicate connections
         if (this.socket?.connected && this.currentToken === token) {
-            console.log("[SocketManager] Da ket noi truoc do");
+            console.log("[SocketManager] Đã kết nối trước đó");
             return true;
         }
 
@@ -121,7 +121,7 @@ class SocketManager {
 
             // Connection successful
             this.socket.on("connect", () => {
-                console.log("[SocketManager] Da ket noi:", this.socket?.id);
+                console.log("[SocketManager] Đã kết nối:", this.socket?.id);
                 this.setStatus("connected");
                 this.clearReconnectTimer();
 
@@ -132,12 +132,12 @@ class SocketManager {
 
             // Server confirmation
             this.socket.on("connected", (data) => {
-                console.log("[SocketManager] Da xac thuc:", data);
+                console.log("[SocketManager] Đã xác thực:", data);
             });
 
             // Disconnection
             this.socket.on("disconnect", (reason) => {
-                console.log("[SocketManager] Ngat ket noi:", reason);
+                console.log("[SocketManager] Ngắt kết nối:", reason);
                 this.setStatus("disconnected");
 
                 // Handle server-initiated disconnect
@@ -149,7 +149,7 @@ class SocketManager {
 
             // Connection error
             this.socket.on("connect_error", async (error) => {
-                console.error("[SocketManager] Loi ket noi:", error.message);
+                console.error("[SocketManager] Lỗi kết nối:", error.message);
                 this.setStatus("error");
 
                 // Check if token-related error
@@ -177,7 +177,7 @@ class SocketManager {
             // Timeout for connection
             setTimeout(() => {
                 if (this.status === "connecting") {
-                    console.warn("[SocketManager] Het thoi gian ket noi");
+                    console.warn("[SocketManager] Hết thời gian kết nối");
                     this.setStatus("error");
                     resolve(false);
                 }
@@ -200,7 +200,7 @@ class SocketManager {
 
         this.currentToken = null;
         this.setStatus("disconnected");
-        console.log("[SocketManager] Da ngat ket noi");
+        console.log("[SocketManager] Đã ngắt kết nối");
     }
 
     // ============================================================================
@@ -280,7 +280,7 @@ class SocketManager {
         if (this.socket?.connected) {
             this.socket.emit(event, data);
         } else {
-            console.warn("[SocketManager] Khong the gui - chua ket noi");
+            console.warn("[SocketManager] Không thể gửi - chưa kết nối");
         }
     }
 
@@ -314,7 +314,7 @@ class SocketManager {
     }
 
     private async handleAuthError(): Promise<void> {
-        console.warn("[SocketManager] Loi xac thuc socket - khong anh huong dang nhap");
+        console.warn("[SocketManager] Lỗi xác thực socket - không ảnh hưởng đăng nhập");
 
         // Just disconnect the socket - do NOT force logout
         // Socket errors should not affect the user's authenticated state
@@ -340,7 +340,7 @@ class SocketManager {
 
             const token = TokenService.getAccessToken();
             if (token && this.status !== "connected") {
-                console.log("[SocketManager] Dang thu ket noi lai...");
+                console.log("[SocketManager] Đang thử kết nối lại...");
                 await this.connect(token);
             }
         }, SOCKET_OPTIONS.reconnectionDelay);

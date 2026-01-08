@@ -272,35 +272,35 @@ export default function RealtimeDemoPage() {
       {/* Instructions */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Huong dan Su dung</CardTitle>
+          <CardTitle>Hướng dẫn Sử dụng</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-muted-foreground">
           <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-            <p className="font-medium text-foreground">1. Ket noi WebSocket</p>
+            <p className="font-medium text-foreground">1. Kết nối WebSocket</p>
             <p>
-              Khi ban dang nhap, frontend tu dong ket noi den may chu WebSocket
-              su dung JWT token de xac thuc.
+              Khi bạn đăng nhập, frontend tự động kết nối đến máy chủ WebSocket
+              sử dụng JWT token để xác thực.
             </p>
           </div>
           <div className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
-            <p className="font-medium text-foreground">2. Thong bao theo Phong</p>
+            <p className="font-medium text-foreground">2. Thông báo theo Phòng</p>
             <p>
-              Moi nguoi dung tu dong tham gia phong ca nhan (user:userId) va phong
-              doanh nghiep (tenant:tenantId) de nhan thong bao truc tiep.
+              ỗi người dùng tự động tham gia phòng cá nhân (user:userId) và phòng
+              doanh nghiệp (tenant:tenantId) để nhận thông báo trực tiếp.
             </p>
           </div>
           <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950">
-            <p className="font-medium text-foreground">3. Thong bao thu nghiem</p>
+            <p className="font-medium text-foreground">3. Thông báo thử nghiệm</p>
             <p>
-              Nut "Gui qua Socket" gui su kien test:notification den may chu,
-              sau do may chu gui thong bao lai cho socket cua ban.
+              nút "Gửi qua Socket" gửi sự kiện test:notification đến máy chủ,
+              sau đó máy chủ gửi thông báo lại cho socket của bạn.
             </p>
           </div>
           <div className="p-4 rounded-lg bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
-            <p className="font-medium text-foreground">4. Tich hop San xuat</p>
+            <p className="font-medium text-foreground">4. Tích hợp Sản xuất</p>
             <p>
-              Trong moi truong san xuat, cac dich vu backend su dung RealtimeService.notifyUser()
-              de day thong bao den nguoi dung cu the theo thoi gian thuc.
+              Trong môi trường sản xuất, các dịch vụ backend sử dụng RealtimeService.notifyUser()
+              để đẩy thông báo đến người dùng cụ thể theo thời gian thực.
             </p>
           </div>
         </CardContent>

@@ -83,15 +83,14 @@ export const useAuthStore = create<AuthState>()(
             initializeAuth: async () => {
                 const token = TokenService.getAccessToken();
 
-                // No token - not authenticated
                 if (!token) {
                     set({ isInitialized: true, isAuthenticated: false, user: null });
                     return false;
                 }
 
                 try {
-                    // Verify token with backend
-                    const response = await httpClient.get("/auth/me");
+                    // Backend exposes /auth/profile
+                    const response = await httpClient.get("/auth/profile");
                     const user = response.data;
 
                     set({
@@ -101,12 +100,9 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
 
-                    // Connect socket AFTER auth is verified
                     socketManager.connect(token);
-
                     return true;
                 } catch (error) {
-                    // Token invalid - clear everything
                     TokenService.clearTokens();
                     set({
                         user: null,
@@ -126,12 +122,24 @@ export const useAuthStore = create<AuthState>()(
 
                 try {
                     const response = await httpClient.post("/auth/login", credentials);
-                    const { accessToken, refreshToken, user } = response.data;
+                    const {
+                        accessToken,
+                        refreshToken,
+                        access_token,
+                        refresh_token,
+                        user,
+                    } = response.data as Record<string, any>;
 
-                    // Store tokens securely
-                    TokenService.setAccessToken(accessToken);
-                    if (refreshToken) {
-                        TokenService.setRefreshToken(refreshToken);
+                    const access = accessToken ?? access_token;
+                    const refresh = refreshToken ?? refresh_token;
+
+                    if (!access) {
+                        throw new Error("Phản hồi đăng nhập không chứa access token");
+                    }
+
+                    TokenService.setAccessToken(access);
+                    if (refresh) {
+                        TokenService.setRefreshToken(refresh);
                     }
 
                     // Update state
@@ -144,7 +152,7 @@ export const useAuthStore = create<AuthState>()(
                     });
 
                     // Connect socket with new token
-                    socketManager.connect(accessToken);
+                    socketManager.connect(access);
 
                     return true;
                 } catch (error: unknown) {

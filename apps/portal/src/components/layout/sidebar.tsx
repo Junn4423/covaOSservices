@@ -1,12 +1,12 @@
 /**
- * Sidebar Component - Professional ServiceOS Navigation
+ * Sidebar Component - ServiceOS Navigation
+ * Su dung Design System mau sac moi
  * 
  * Features:
- * - Collapsible module menu
- * - All 12 modules with Vietnamese labels
- * - Active state tracking
- * - Premium dark theme design
- * - User info section
+ * - Menu co the dong mo (collapsible)
+ * - 12 Module voi nhan Tieng Viet
+ * - Trang thai active tracking
+ * - Theme toi (dark theme) voi mau --primary-navy
  */
 
 "use client";
@@ -46,10 +46,10 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Overlay cho mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-[var(--black)]/50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
@@ -58,8 +58,8 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-72 flex flex-col",
-          "bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800",
-          "border-r border-slate-700/50",
+          "sidebar-nav",
+          "border-r border-[var(--gray-700)]/50",
           "transform transition-transform duration-300 ease-in-out",
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
@@ -68,22 +68,25 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         {/* ========================================
             Logo Header
             ======================================== */}
-        <div className="flex items-center gap-3 h-16 px-6 border-b border-slate-700/50">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
-            <span className="text-lg font-bold text-white">S</span>
+        <div className="flex items-center gap-3 h-16 px-6 border-b border-[var(--gray-700)]/50">
+          <div 
+            className="flex h-10 w-10 items-center justify-center rounded-xl shadow-lg"
+            style={{ backgroundColor: "var(--primary-dark)" }}
+          >
+            <span className="text-lg font-bold text-[var(--white)]">S</span>
           </div>
           <div>
-            <h1 className="font-bold text-white text-lg">ServiceOS</h1>
-            <p className="text-xs text-slate-400">Nền tảng quản lý dịch vụ doanh nghiệp</p>
+            <h1 className="font-bold text-[var(--white)] text-lg">ServiceOS</h1>
+            <p className="text-xs text-[var(--gray-400)]">Nen tang quan ly dich vu</p>
           </div>
         </div>
 
         {/* ========================================
-            Quick Access Links
+            Truy cap nhanh
             ======================================== */}
-        <div className="px-4 py-4 border-b border-slate-700/50">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 px-2">
-            Truy cập nhanh
+        <div className="px-4 py-4 border-b border-[var(--gray-700)]/50">
+          <p className="text-xs font-medium text-[var(--gray-500)] uppercase tracking-wider mb-3 px-2">
+            Truy cap nhanh
           </p>
           <nav className="space-y-1">
             {QUICK_ACCESS.map((item) => {
@@ -96,16 +99,16 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
                     isActive
-                      ? "bg-indigo-500/20 text-indigo-400"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                      ? "bg-[var(--primary-blue)]/20 text-[var(--primary-light)]"
+                      : "sidebar-nav-item"
                   )}
                 >
                   <span
                     className={cn(
                       "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold",
                       isActive
-                        ? "bg-indigo-500 text-white"
-                        : "bg-slate-700 text-slate-300"
+                        ? "bg-[var(--primary-blue)] text-[var(--white)]"
+                        : "bg-[var(--gray-700)] text-[var(--gray-300)]"
                     )}
                   >
                     {item.iconLetter}
@@ -118,11 +121,11 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         </div>
 
         {/* ========================================
-            Module Navigation (12 Modules)
+            Danh sach Module (12 Module)
             ======================================== */}
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 px-2">
-            Cac module
+          <p className="text-xs font-medium text-[var(--gray-500)] uppercase tracking-wider mb-3 px-2">
+            Cac phan he
           </p>
           <nav className="space-y-1">
             {MODULES.map((module) => {
@@ -137,8 +140,8 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                     className={cn(
                       "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer",
                       isActive
-                        ? "bg-slate-800 text-white"
-                        : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
+                        ? "bg-[var(--primary-blue)] text-[var(--white)]"
+                        : "sidebar-nav-item"
                     )}
                     onClick={() => hasSubModules && toggleModule(module.id)}
                   >
@@ -153,7 +156,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                       className="flex items-center gap-3 flex-1"
                     >
                       <span
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-white"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-[var(--white)]"
                         style={{ backgroundColor: module.color }}
                       >
                         {module.iconLetter}
@@ -163,7 +166,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                     {hasSubModules && (
                       <span
                         className={cn(
-                          "text-slate-400 transition-transform",
+                          "text-[var(--gray-400)] transition-transform",
                           isExpanded && "rotate-90"
                         )}
                       >
@@ -174,7 +177,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
 
                   {/* Sub Modules */}
                   {hasSubModules && isExpanded && (
-                    <div className="ml-4 mt-1 space-y-1 border-l-2 border-slate-700 pl-4">
+                    <div className="ml-4 mt-1 space-y-1 border-l-2 border-[var(--gray-700)] pl-4">
                       {module.subModules!.map((sub) => (
                         <Link
                           key={sub.id}
@@ -183,8 +186,8 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                           className={cn(
                             "block px-3 py-1.5 rounded-lg text-sm transition-all",
                             isSubModuleActive(sub.href)
-                              ? "bg-indigo-500/20 text-indigo-400"
-                              : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                              ? "bg-[var(--primary-blue)]/20 text-[var(--primary-light)]"
+                              : "text-[var(--gray-400)] hover:bg-[var(--gray-800)]/50 hover:text-[var(--white)]"
                           )}
                         >
                           {sub.label}
@@ -199,12 +202,15 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         </div>
 
         {/* ========================================
-            User Section
+            Thong tin nguoi dung
             ======================================== */}
-        <div className="border-t border-slate-700/50 p-4">
+        <div className="border-t border-[var(--gray-700)]/50 p-4">
           {/* User Info */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-sm">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--gray-800)]/50 mb-3">
+            <div 
+              className="flex h-10 w-10 items-center justify-center rounded-full text-[var(--white)] font-bold text-sm"
+              style={{ backgroundColor: "var(--primary-dark)" }}
+            >
               {user?.ho_ten
                 ?.split(" ")
                 .map((n) => n[0])
@@ -213,21 +219,21 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 .slice(0, 2) || "U"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-[var(--white)] truncate">
                 {user?.ho_ten || "Nguoi dung"}
               </p>
-              <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+              <p className="text-xs text-[var(--gray-400)] truncate">{user?.email}</p>
             </div>
           </div>
 
-          {/* Logout Button */}
+          {/* Nut Dang xuat */}
           <button
             onClick={logout}
             className={cn(
               "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium",
-              "text-slate-300 hover:text-white",
-              "bg-slate-800 hover:bg-slate-700",
-              "border border-slate-700 hover:border-slate-600",
+              "text-[var(--gray-300)] hover:text-[var(--white)]",
+              "bg-[var(--gray-800)] hover:bg-[var(--gray-700)]",
+              "border border-[var(--gray-700)] hover:border-[var(--gray-600)]",
               "transition-all"
             )}
           >
