@@ -6,6 +6,7 @@
 export {
   useAuthStore,
   initializeAuth,
-  isAuthInitialized
+  isAuthInitialized,
+  resetAuthInit
 } from "@/stores/auth.store";
 export type { User, UserRole, LoginCredentials, AuthState } from "@/stores/auth.store";

@@ -31,26 +31,47 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { setToastCallback } = useSocketStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // ========================================
+  // Track mount state for SSR
+  // ========================================
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ========================================
   // Khoi tao Auth (QUAN TRONG - chay truoc)
   // ========================================
   useEffect(() => {
+    if (!mounted) return;
+
+    let isCancelled = false;
+
     const checkAuth = async () => {
       try {
         const isValid = await initializeAuth();
-        if (!isValid) {
+        if (!isCancelled && !isValid) {
           router.replace("/login");
+          return;
         }
       } catch {
-        router.replace("/login");
-      } finally {
+        if (!isCancelled) {
+          router.replace("/login");
+          return;
+        }
+      }
+      if (!isCancelled) {
         setIsCheckingAuth(false);
       }
     };
 
     checkAuth();
-  }, [router]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [mounted, router]);
 
   // ========================================
   // Thiet lap Toast Callback cho Socket Events
@@ -75,16 +96,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // Chuyen huong neu chua xac thuc sau khi init
   // ========================================
   useEffect(() => {
-    if (isInitialized && !isAuthenticated) {
+    if (mounted && isInitialized && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [isInitialized, isAuthenticated, router]);
+  }, [mounted, isInitialized, isAuthenticated, router]);
 
   // ========================================
   // Trang thai Loading
   // ========================================
-  if (isCheckingAuth || !isInitialized) {
-    return <GlobalLoader message="Dang xac thuc..." />;
+  if (!mounted || isCheckingAuth || !isInitialized) {
+    return <GlobalLoader message="Đang xác thực..." />;
   }
 
   // ========================================

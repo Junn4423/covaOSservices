@@ -36,10 +36,14 @@ interface UploadedFile {
 export class DbStorageService {
     private readonly logger = new Logger(DbStorageService.name);
 
-    // Cau hinh nen anh
-    private readonly MAX_WIDTH = 800;
-    private readonly QUALITY = 60;
-    private readonly MAX_COMPRESSED_SIZE = 100 * 1024; // 100KB
+    // Cau hinh nen anh - can bang giua dung luong va chat luong
+    private readonly MAX_WIDTH = 1200;          // Tang len cho chat luong tot hon
+    private readonly MAX_HEIGHT = 1200;         // Gioi han chieu cao
+    private readonly QUALITY_HIGH = 80;         // Chat luong cao cho anh nho
+    private readonly QUALITY_MEDIUM = 65;       // Chat luong trung binh
+    private readonly QUALITY_LOW = 50;          // Chat luong thap cho anh lon
+    private readonly MAX_COMPRESSED_SIZE = 200 * 1024; // 200KB - tang len mot chut
+    private readonly TARGET_SIZE = 150 * 1024;  // 150KB - muc tieu
 
     constructor(private readonly prisma: PrismaService) {}
 
@@ -84,11 +88,14 @@ export class DbStorageService {
         const storedName = `${fileId}${ext}`;
 
         try {
-            // Nen anh bang Sharp
+            // Nen anh bang Sharp - adaptive compression
             const compressedBuffer = await this.compressImage(file.buffer, file.mimetype);
             
+            // Xac dinh output format
+            const outputMime = file.mimetype === 'image/png' ? 'image/png' : 'image/jpeg';
+            
             // Convert sang Base64 voi data URI
-            const base64Data = `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
+            const base64Data = `data:${outputMime};base64,${compressedBuffer.toString('base64')}`;
 
             // Luu vao Database
             await this.prisma.runAsSystem(async () => {
@@ -99,7 +106,7 @@ export class DbStorageService {
                         nguoi_tao_id: userId,
                         ten_goc: file.originalname,
                         ten_luu_tru: storedName,
-                        loai_tap_tin: 'image/jpeg', // Sau khi nen luon la JPEG
+                        loai_tap_tin: outputMime,
                         kich_thuoc: compressedBuffer.length,
                         bucket: 'database', // Danh dau la luu trong DB
                         duong_dan: null,
@@ -114,14 +121,14 @@ export class DbStorageService {
 
             this.logger.log(
                 `Da luu anh vao DB: ${fileId} (${file.originalname}) - ` +
-                `Goc: ${(file.size / 1024).toFixed(1)}KB -> Nen: ${(compressedBuffer.length / 1024).toFixed(1)}KB`,
+                `Goc: ${(file.size / 1024).toFixed(1)}KB -> Nen: ${(compressedBuffer.length / 1024).toFixed(1)}KB (${outputMime})`,
             );
 
             return {
                 fileId,
                 originalName: file.originalname,
                 storedName,
-                mimeType: 'image/jpeg',
+                mimeType: outputMime,
                 size: compressedBuffer.length,
                 url,
                 bucket: 'database',
@@ -134,35 +141,61 @@ export class DbStorageService {
     }
 
     /**
-     * Nen anh su dung Sharp
+     * Nen anh su dung Sharp - Adaptive compression
+     * Giu chat luong tot nhat co the trong gioi han dung luong
      */
     private async compressImage(buffer: Buffer, mimeType: string): Promise<Buffer> {
         try {
-            let sharpInstance = sharp(buffer);
+            const metadata = await sharp(buffer).metadata();
+            const originalSize = buffer.length;
 
-            // Lay metadata de kiem tra kich thuoc
-            const metadata = await sharpInstance.metadata();
-            
-            // Resize neu qua lon
-            if (metadata.width && metadata.width > this.MAX_WIDTH) {
-                sharpInstance = sharpInstance.resize(this.MAX_WIDTH, null, {
-                    withoutEnlargement: true,
-                    fit: 'inside',
-                });
+            // Tinh toan kich thuoc moi (giu ty le)
+            let width = metadata.width || this.MAX_WIDTH;
+            let height = metadata.height || this.MAX_HEIGHT;
+
+            if (width > this.MAX_WIDTH || height > this.MAX_HEIGHT) {
+                const ratio = Math.min(
+                    this.MAX_WIDTH / width,
+                    this.MAX_HEIGHT / height
+                );
+                width = Math.round(width * ratio);
+                height = Math.round(height * ratio);
             }
 
-            // Convert sang JPEG voi quality thap de giam dung luong
-            let compressedBuffer = await sharpInstance
-                .jpeg({ quality: this.QUALITY, progressive: true })
-                .toBuffer();
+            // Xac dinh format output - uu tien WebP neu browser ho tro
+            const outputFormat = mimeType === 'image/png' ? 'png' : 'jpeg';
 
-            // Neu van qua lon, giam quality them
+            // Thu nen voi chat luong cao truoc
+            let compressedBuffer = await this.compressWithQuality(
+                buffer, width, height, this.QUALITY_HIGH, outputFormat
+            );
+
+            // Neu van qua lon, giam chat luong dan
             if (compressedBuffer.length > this.MAX_COMPRESSED_SIZE) {
-                compressedBuffer = await sharp(buffer)
-                    .resize(this.MAX_WIDTH, null, { withoutEnlargement: true, fit: 'inside' })
-                    .jpeg({ quality: 40, progressive: true })
-                    .toBuffer();
+                compressedBuffer = await this.compressWithQuality(
+                    buffer, width, height, this.QUALITY_MEDIUM, outputFormat
+                );
             }
+
+            if (compressedBuffer.length > this.MAX_COMPRESSED_SIZE) {
+                compressedBuffer = await this.compressWithQuality(
+                    buffer, width, height, this.QUALITY_LOW, outputFormat
+                );
+            }
+
+            // Neu van qua lon, giam kich thuoc them
+            if (compressedBuffer.length > this.MAX_COMPRESSED_SIZE) {
+                const smallerWidth = Math.round(width * 0.7);
+                const smallerHeight = Math.round(height * 0.7);
+                compressedBuffer = await this.compressWithQuality(
+                    buffer, smallerWidth, smallerHeight, this.QUALITY_LOW, outputFormat
+                );
+            }
+
+            const compressionRatio = ((originalSize - compressedBuffer.length) / originalSize * 100).toFixed(1);
+            this.logger.debug(
+                `Nen anh: ${(originalSize/1024).toFixed(1)}KB -> ${(compressedBuffer.length/1024).toFixed(1)}KB (giam ${compressionRatio}%)`
+            );
 
             return compressedBuffer;
         } catch (error) {
@@ -170,6 +203,33 @@ export class DbStorageService {
             // Fallback: tra ve buffer goc neu khong the nen
             return buffer;
         }
+    }
+
+    /**
+     * Helper: Nen anh voi quality cu the
+     */
+    private async compressWithQuality(
+        buffer: Buffer,
+        width: number,
+        height: number,
+        quality: number,
+        format: 'jpeg' | 'png'
+    ): Promise<Buffer> {
+        let sharpInstance = sharp(buffer)
+            .resize(width, height, {
+                withoutEnlargement: true,
+                fit: 'inside',
+            });
+
+        if (format === 'png') {
+            return sharpInstance
+                .png({ quality, compressionLevel: 9 })
+                .toBuffer();
+        }
+
+        return sharpInstance
+            .jpeg({ quality, progressive: true, mozjpeg: true })
+            .toBuffer();
     }
 
     /**

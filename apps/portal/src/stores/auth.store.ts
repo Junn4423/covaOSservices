@@ -62,6 +62,13 @@ export interface AuthState {
 }
 
 // ============================================================================
+// INITIALIZATION STATE (Module-level for singleton behavior)
+// ============================================================================
+
+let authInitPromise: Promise<boolean> | null = null;
+let isInitializing = false;
+
+// ============================================================================
 // AUTH STORE
 // ============================================================================
 
@@ -192,10 +199,15 @@ export const useAuthStore = create<AuthState>()(
                     // Clear query cache
                     queryClient.clear();
 
+                    // Reset auth init promise (will be set in resetAuthInit)
+                    authInitPromise = null;
+                    isInitializing = false;
+
                     // Reset state
                     set({
                         user: null,
                         isAuthenticated: false,
+                        isInitialized: false,
                         isLoading: false,
                         error: null,
                     });
@@ -222,10 +234,15 @@ export const useAuthStore = create<AuthState>()(
                 // Clear query cache
                 queryClient.clear();
 
+                // Reset auth init promise
+                authInitPromise = null;
+                isInitializing = false;
+
                 // Reset state
                 set({
                     user: null,
                     isAuthenticated: false,
+                    isInitialized: false,
                     isLoading: false,
                     error: "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
                 });
@@ -254,10 +271,13 @@ export const useAuthStore = create<AuthState>()(
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,
             }),
-            // Rehydrate isInitialized to false to force check
+            // Rehydrate sets hasHydrated but keeps isInitialized false
+            // This ensures we verify token before trusting persisted state
             onRehydrateStorage: () => (state) => {
                 if (state) {
+                    // Keep isInitialized false - will be set after API validation
                     state.isInitialized = false;
+                    state.isLoading = false;
                 }
             },
         }
@@ -268,18 +288,37 @@ export const useAuthStore = create<AuthState>()(
 // INITIALIZATION HELPER
 // ============================================================================
 
-let authInitPromise: Promise<boolean> | null = null;
-
 /**
  * Initialize auth state before React renders
  * Call this in _app.tsx or root layout
  * Prevents content flash by ensuring auth state is known
  */
 export const initializeAuth = (): Promise<boolean> => {
-    if (!authInitPromise) {
-        authInitPromise = useAuthStore.getState().initializeAuth();
+    // If already initialized, return immediately
+    if (useAuthStore.getState().isInitialized) {
+        return Promise.resolve(useAuthStore.getState().isAuthenticated);
     }
+
+    // If already in progress, return existing promise
+    if (authInitPromise && isInitializing) {
+        return authInitPromise;
+    }
+
+    // Start new initialization
+    isInitializing = true;
+    authInitPromise = useAuthStore.getState().initializeAuth().finally(() => {
+        isInitializing = false;
+    });
+    
     return authInitPromise;
+};
+
+/**
+ * Reset auth initialization (useful for logout)
+ */
+export const resetAuthInit = (): void => {
+    authInitPromise = null;
+    isInitializing = false;
 };
 
 /**

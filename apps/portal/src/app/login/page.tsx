@@ -55,7 +55,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const { login, isLoading, error, isAuthenticated, clearError, isInitialized } = useAuthStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [hasRedirected, setHasRedirected] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // React Hook Form voi Zod resolver
   const {
@@ -71,34 +71,45 @@ export default function LoginPage() {
     },
   });
 
-  // Kiem tra da xac thuc chua
+  // Track mount state to prevent SSR issues
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Kiem tra da xac thuc chua - chi chay mot lan khi mount
+  useEffect(() => {
+    if (!mounted) return;
+
+    let isCancelled = false;
+
     const checkAuth = async () => {
       try {
         const isValid = await initializeAuth();
-        if (isValid) {
-          if (!hasRedirected) {
-            setHasRedirected(true);
-            router.replace("/dashboard");
-          }
+        if (!isCancelled && isValid) {
+          router.replace("/dashboard");
+          return;
         }
       } catch {
         // Chưa xác thực, ở lại trang đăng nhập
-      } finally {
+      }
+      if (!isCancelled) {
         setIsCheckingAuth(false);
       }
     };
 
     checkAuth();
-  }, [router, hasRedirected]);
 
-  // Chuyen huong neu da xac thuc
+    return () => {
+      isCancelled = true;
+    };
+  }, [mounted, router]);
+
+  // Chuyen huong neu da xac thuc (sau khi init xong)
   useEffect(() => {
-    if (isInitialized && isAuthenticated && !hasRedirected) {
-      setHasRedirected(true);
+    if (mounted && isInitialized && isAuthenticated) {
       router.replace("/dashboard");
     }
-  }, [isInitialized, isAuthenticated, router, hasRedirected]);
+  }, [mounted, isInitialized, isAuthenticated, router]);
 
   // Hien thi toast loi
   useEffect(() => {
@@ -125,16 +136,19 @@ export default function LoginPage() {
         title: "Đăng nhập thành công",
         description: "Chào mừng bạn đến với ServiceOS!",
       });
-      // Buoc 1: Chuyen huong den dashboard
-      await router.push("/dashboard");
-      // Buoc 2: Refresh de Next.js cap nhat Layout (Header/Sidebar)
-      router.refresh();
+      // Chuyen huong den dashboard
+      router.replace("/dashboard");
     }
   };
 
   // Hien thi loader khi dang kiem tra
-  if (isCheckingAuth) {
+  if (!mounted || isCheckingAuth) {
     return <GlobalLoader message="Đang kiểm tra phiên đăng nhập..." />;
+  }
+
+  // Neu da xac thuc, khong hien thi gi (se redirect)
+  if (isAuthenticated) {
+    return <GlobalLoader message="Đang chuyển hướng..." />;
   }
 
   return (
