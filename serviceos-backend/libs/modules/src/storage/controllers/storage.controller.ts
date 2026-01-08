@@ -1,11 +1,11 @@
 /**
  * ============================================================
  * STORAGE CONTROLLER - File Upload API
- * ServiceOS - SaaS Backend - Phase 16
+ * ServiceOS - SaaS Backend - Phase 18
  * ============================================================
  * 
  * REST API endpoints for file upload and management.
- * Supports multipart/form-data uploads with validation.
+ * Supports DB storage (Base64) and optional S3/MinIO.
  */
 
 import {
@@ -24,7 +24,10 @@ import {
     FileTypeValidator,
     HttpCode,
     HttpStatus,
+    Res,
+    StreamableFile,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
     ApiTags,
@@ -35,8 +38,9 @@ import {
     ApiResponse,
     ApiQuery,
 } from '@nestjs/swagger';
-import { ActiveUser, TenantId, UserId } from '@libs/common';
+import { ActiveUser, TenantId, UserId, Public } from '@libs/common';
 import { StorageService } from '../services/storage.service';
+import { DbStorageService } from '../services/db-storage.service';
 import {
     FileType,
     UploadResponseDto,
@@ -49,7 +53,94 @@ import {
 @ApiBearerAuth()
 @Controller('storage')
 export class StorageController {
-    constructor(private readonly storageService: StorageService) {}
+    constructor(
+        private readonly storageService: StorageService,
+        private readonly dbStorageService: DbStorageService,
+    ) { }
+
+    // ============================================================
+    // RENDER IMAGE FROM DATABASE (Public endpoint)
+    // ============================================================
+    @Get('render/:fileId')
+    @Public()
+    @ApiOperation({
+        summary: 'Render anh tu Database',
+        description: 'Tra ve anh duoc luu trong Database dang Base64. Endpoint cong khai.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Tra ve file anh',
+        content: { 'image/jpeg': {} },
+    })
+    async renderImage(
+        @Param('fileId') fileId: string,
+        @Res() res: Response,
+    ): Promise<void> {
+        const fileData = await this.dbStorageService.getFileBuffer(fileId);
+
+        if (!fileData) {
+            res.status(404).json({ message: 'Khong tim thay file' });
+            return;
+        }
+
+        // Set headers de browser hien thi anh
+        res.set({
+            'Content-Type': fileData.mimeType,
+            'Content-Length': fileData.buffer.length,
+            'Cache-Control': 'public, max-age=31536000', // Cache 1 nam
+        });
+
+        res.send(fileData.buffer);
+    }
+
+    // ============================================================
+    // UPLOAD TO DATABASE (Default mode)
+    // ============================================================
+    @Post('upload/db')
+    @ApiOperation({
+        summary: 'Upload anh vao Database',
+        description: 'Upload va nen anh, luu vao Database dang Base64. Toi da 5MB.',
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'File anh can upload',
+                },
+            },
+            required: ['file'],
+        },
+    })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadToDb(
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZES.IMAGE }),
+                    new FileTypeValidator({ fileType: /^image\/(jpeg|png|gif|webp)$/ }),
+                ],
+            }),
+        )
+        file: Express.Multer.File,
+        @TenantId() tenantId: string,
+        @UserId() userId: string,
+    ): Promise<UploadResponseDto> {
+        return this.dbStorageService.uploadFile(
+            {
+                originalname: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size,
+                buffer: file.buffer,
+            },
+            tenantId,
+            userId,
+            { fileType: FileType.IMAGE },
+        );
+    }
 
     // ============================================================
     // UPLOAD SINGLE FILE
@@ -95,13 +186,26 @@ export class StorageController {
         @Body('folder') folder?: string,
         @Body('fileType') fileType?: FileType,
     ): Promise<UploadResponseDto> {
+        const fileData = {
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size,
+            buffer: file.buffer,
+        };
+
+        // For images, fallback to DB storage if S3/MinIO is not configured
+        const isImage = file.mimetype.startsWith('image/');
+        if (!this.storageService.isStorageConfigured() && isImage) {
+            return this.dbStorageService.uploadFile(
+                fileData,
+                tenantId,
+                userId,
+                { fileType: FileType.IMAGE },
+            );
+        }
+
         return this.storageService.uploadFile(
-            {
-                originalname: file.originalname,
-                mimetype: file.mimetype,
-                size: file.size,
-                buffer: file.buffer,
-            },
+            fileData,
             tenantId,
             userId,
             { folder, fileType },
@@ -149,13 +253,25 @@ export class StorageController {
         @UserId() userId: string,
         @Body('folder') folder?: string,
     ): Promise<UploadResponseDto> {
+        const fileData = {
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size,
+            buffer: file.buffer,
+        };
+
+        // Fallback to DB storage if S3/MinIO is not configured
+        if (!this.storageService.isStorageConfigured()) {
+            return this.dbStorageService.uploadFile(
+                fileData,
+                tenantId,
+                userId,
+                { fileType: FileType.IMAGE },
+            );
+        }
+
         return this.storageService.uploadFile(
-            {
-                originalname: file.originalname,
-                mimetype: file.mimetype,
-                size: file.size,
-                buffer: file.buffer,
-            },
+            fileData,
             tenantId,
             userId,
             { folder: folder || 'images', fileType: FileType.IMAGE },

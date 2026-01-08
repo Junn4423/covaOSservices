@@ -306,26 +306,38 @@ class SocketManager {
 
     private isTokenError(error: Error | unknown): boolean {
         const errorMessage = error instanceof Error ? error.message : String(error);
+        const lowerMessage = errorMessage.toLowerCase();
         return (
-            errorMessage.toLowerCase().includes("token") ||
-            errorMessage.toLowerCase().includes("unauthorized") ||
-            errorMessage.toLowerCase().includes("authentication")
+            lowerMessage.includes("token") ||
+            lowerMessage.includes("unauthorized") ||
+            lowerMessage.includes("authentication") ||
+            lowerMessage.includes("jwt expired") ||
+            lowerMessage.includes("jwt malformed") ||
+            lowerMessage.includes("invalid token") ||
+            lowerMessage.includes("expired")
         );
     }
 
     private async handleAuthError(): Promise<void> {
-        console.warn("[SocketManager] Lỗi xác thực socket - không ảnh hưởng đăng nhập");
+        console.warn("[SocketManager] Loi xac thuc socket - token het han hoac khong hop le");
 
-        // Just disconnect the socket - do NOT force logout
-        // Socket errors should not affect the user's authenticated state
-        // The user can still use the app without real-time features
+        // Ngat ket noi socket ngay lap tuc de khong spam log
         this.disconnect();
 
-        // Note: We do NOT call forceLogout() here because:
-        // 1. The authentication state is managed by auth.store.ts
-        // 2. Socket connection is a secondary feature
-        // 3. HTTP requests with the token may still work even if socket fails
-        // 4. forceLogout should only be called by HTTP interceptor when API returns 401
+        // Goi forceLogout tu auth store de dua user ve trang login
+        // Chi goi khi dang o client-side
+        if (typeof window !== "undefined") {
+            try {
+                // Dynamic import de tranh circular dependency
+                const { useAuthStore } = await import("@/stores/auth.store");
+                const { forceLogout } = useAuthStore.getState();
+                forceLogout();
+            } catch (error) {
+                console.error("[SocketManager] Khong the goi forceLogout:", error);
+                // Fallback: chuyen ve trang login thu cong
+                window.location.href = "/login";
+            }
+        }
     }
 
     // ============================================================================

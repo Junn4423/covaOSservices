@@ -55,6 +55,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const { login, isLoading, error, isAuthenticated, clearError, isInitialized } = useAuthStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   // React Hook Form voi Zod resolver
   const {
@@ -76,7 +77,10 @@ export default function LoginPage() {
       try {
         const isValid = await initializeAuth();
         if (isValid) {
-          router.replace("/dashboard");
+          if (!hasRedirected) {
+            setHasRedirected(true);
+            router.replace("/dashboard");
+          }
         }
       } catch {
         // Chưa xác thực, ở lại trang đăng nhập
@@ -86,14 +90,15 @@ export default function LoginPage() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, hasRedirected]);
 
   // Chuyen huong neu da xac thuc
   useEffect(() => {
-    if (isInitialized && isAuthenticated) {
+    if (isInitialized && isAuthenticated && !hasRedirected) {
+      setHasRedirected(true);
       router.replace("/dashboard");
     }
-  }, [isInitialized, isAuthenticated, router]);
+  }, [isInitialized, isAuthenticated, router, hasRedirected]);
 
   // Hien thi toast loi
   useEffect(() => {
@@ -120,7 +125,10 @@ export default function LoginPage() {
         title: "Đăng nhập thành công",
         description: "Chào mừng bạn đến với ServiceOS!",
       });
-      router.replace("/dashboard");
+      // Buoc 1: Chuyen huong den dashboard
+      await router.push("/dashboard");
+      // Buoc 2: Refresh de Next.js cap nhat Layout (Header/Sidebar)
+      router.refresh();
     }
   };
 
@@ -130,17 +138,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4"
       style={{ backgroundColor: "var(--primary-navy)" }}
     >
       {/* Trang tri nen */}
       <div className="absolute inset-0 overflow-hidden">
-        <div 
+        <div
           className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-20"
           style={{ backgroundColor: "var(--primary-dark)" }}
         />
-        <div 
+        <div
           className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl opacity-20"
           style={{ backgroundColor: "var(--primary-blue)" }}
         />
@@ -150,9 +158,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-md relative z-10 bg-[var(--white)]/10 backdrop-blur-xl border-[var(--white)]/20 shadow-2xl">
         <CardHeader className="space-y-1 text-center pb-8">
           {/* Logo */}
-          <div 
+          <div
             className="mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
-            style={{ 
+            style={{
               backgroundColor: "var(--primary-dark)",
               boxShadow: "0 10px 40px rgba(18, 78, 102, 0.4)"
             }}
@@ -181,8 +189,9 @@ export default function LoginPage() {
                 placeholder="admin@example.com"
                 {...register("email")}
                 disabled={isLoading || isSubmitting}
+                style={{ backgroundColor: '#ffffff', color: '#111827' }}
                 className={cn(
-                  "bg-[var(--white)]/5 border-[var(--white)]/20 text-[var(--white)] placeholder:text-[var(--gray-400)]",
+                  "border-gray-300 placeholder:text-gray-400",
                   "focus:border-[var(--primary-blue)] focus:ring-[var(--primary-blue)]",
                   errors.email && "border-[var(--error)] focus:border-[var(--error)]"
                 )}
@@ -203,8 +212,9 @@ export default function LoginPage() {
                 placeholder="Nhập mật khẩu của bạn"
                 {...register("password")}
                 disabled={isLoading || isSubmitting}
+                style={{ backgroundColor: '#ffffff', color: '#111827' }}
                 className={cn(
-                  "bg-[var(--white)]/5 border-[var(--white)]/20 text-[var(--white)] placeholder:text-[var(--gray-400)]",
+                  "border-gray-300 placeholder:text-gray-400",
                   "focus:border-[var(--primary-blue)] focus:ring-[var(--primary-blue)]",
                   errors.password && "border-[var(--error)] focus:border-[var(--error)]"
                 )}
@@ -225,7 +235,8 @@ export default function LoginPage() {
                 placeholder="VD: DEMO"
                 {...register("tenant_code")}
                 disabled={isLoading || isSubmitting}
-                className="bg-[var(--white)]/5 border-[var(--white)]/20 text-[var(--white)] placeholder:text-[var(--gray-400)] focus:border-[var(--primary-blue)] focus:ring-[var(--primary-blue)]"
+                style={{ backgroundColor: '#ffffff', color: '#111827' }}
+                className="border-gray-300 placeholder:text-gray-400 focus:border-[var(--primary-blue)] focus:ring-[var(--primary-blue)]"
               />
               <p className="text-xs text-[var(--gray-400)]">
                 Nhập mã doanh nghiệp nếu sử dụng chế độ đa đối tượng
@@ -237,10 +248,11 @@ export default function LoginPage() {
               type="submit"
               disabled={isLoading || isSubmitting}
               className={cn(
-                "w-full h-11 text-base font-medium",
-                "transition-all duration-200 shadow-lg"
+                "w-full h-11 text-base font-medium text-white",
+                "transition-all duration-200 shadow-lg",
+                "hover:brightness-110 hover:scale-[1.02]"
               )}
-              style={{ 
+              style={{
                 backgroundColor: "var(--primary-dark)",
                 boxShadow: "0 10px 30px rgba(18, 78, 102, 0.3)"
               }}
@@ -248,7 +260,7 @@ export default function LoginPage() {
               {isLoading || isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-[var(--white)]/30 border-t-[var(--white)] rounded-full animate-spin" />
-                  Dang xu ly...
+                  Đang xử lý...
                 </span>
               ) : (
                 "Đăng nhập"

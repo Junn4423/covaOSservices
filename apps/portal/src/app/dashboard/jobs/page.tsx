@@ -71,7 +71,7 @@ const PRIORITY_CONFIG = {
 const columns: ColumnDef<Job>[] = [
     {
         accessorKey: "ma_cong_viec",
-        header: "Ma CV",
+        header: "Mã công việc",
         cell: ({ row }) => (
             <span 
                 className="font-mono text-xs px-2 py-1 rounded"
@@ -83,7 +83,7 @@ const columns: ColumnDef<Job>[] = [
     },
     {
         accessorKey: "tieu_de",
-        header: "Tieu de",
+        header: "Tiêu đề công việc",
         cell: ({ row }) => (
             <div>
                 <p 
@@ -105,7 +105,7 @@ const columns: ColumnDef<Job>[] = [
     },
     {
         accessorKey: "trang_thai",
-        header: "Trang thai",
+        header: "Trạng thái",
         cell: ({ row }) => {
             const status = row.original.trang_thai;
             const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
@@ -118,7 +118,7 @@ const columns: ColumnDef<Job>[] = [
     },
     {
         accessorKey: "do_uu_tien",
-        header: "Uu tien",
+        header: "Mức ưu tiên",
         cell: ({ row }) => {
             const priority = row.original.do_uu_tien;
             const config = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.medium;
@@ -131,7 +131,7 @@ const columns: ColumnDef<Job>[] = [
     },
     {
         accessorKey: "khach_hang",
-        header: "Khach hang",
+        header: "Khách hàng",
         cell: ({ row }) => (
             <span style={{ color: "var(--gray-600)" }}>
                 {row.original.khach_hang?.ten_khach_hang || "---"}
@@ -140,7 +140,7 @@ const columns: ColumnDef<Job>[] = [
     },
     {
         accessorKey: "nhan_vien",
-        header: "Phu trach",
+        header: "Người phụ trách",
         cell: ({ row }) => (
             <span style={{ color: "var(--gray-600)" }}>
                 {row.original.nhan_vien?.ho_ten || "Chua phan cong"}
@@ -149,7 +149,7 @@ const columns: ColumnDef<Job>[] = [
     },
     {
         accessorKey: "ngay_tao",
-        header: "Ngay tao",
+        header: "Ngày tạo",
         cell: ({ row }) => {
             const date = row.original.ngay_tao;
             if (!date) return "---";
@@ -375,11 +375,11 @@ export default function JobsPage() {
                         data={data?.data || []}
                         pagination={pagination}
                         onPaginationChange={handlePaginationChange}
-                        searchPlaceholder="Tim kiem cong viec..."
+                        searchPlaceholder="Tìm kiếm công việc..."
                         searchValue={search}
                         onSearchChange={handleSearchChange}
                         isLoading={isLoading}
-                        emptyMessage="Chua co cong viec nao"
+                        emptyMessage="Chưa có công việc nào"
                         onRowClick={handleRowClick}
                         onEdit={handleEdit}
                         onDelete={handleDelete}

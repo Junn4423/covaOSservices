@@ -923,9 +923,10 @@ model TapTin {
   ten_luu_tru       String    @db.VarChar(255)    // Stored filename (UUID based)
   loai_tap_tin      String    @db.VarChar(100)    // MIME type
   kich_thuoc        Int       @db.Int             // File size in bytes
-  bucket            String    @db.VarChar(100)    // Storage bucket
-  duong_dan         String    @db.VarChar(500)    // Storage key/path
+  bucket            String?   @db.VarChar(100)    // Storage bucket (null for DB storage)
+  duong_dan         String?   @db.VarChar(500)    // Storage key/path (null for DB storage)
   url_cong_khai     String?   @db.VarChar(500)    // Public URL if available
+  du_lieu_base64    String?   @db.LongText        // Base64 encoded image data (DB storage)
   
   // Optional: Link to specific entity
   loai_doi_tuong    String?   @db.VarChar(50)     // Entity type: AVATAR, CONTRACT, etc.

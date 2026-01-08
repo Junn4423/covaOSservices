@@ -284,13 +284,16 @@ export class StorageService implements OnModuleInit {
 
         if (!file) return null;
 
+        // Handle nullable duong_dan for DB storage
+        const key = file.duong_dan || '';
+        
         return {
             id: file.id,
-            key: file.duong_dan,
+            key,
             originalName: file.ten_goc,
             mimeType: file.loai_tap_tin,
             size: file.kich_thuoc,
-            url: file.url_cong_khai || this.buildPublicUrl(file.duong_dan),
+            url: file.url_cong_khai || (key ? this.buildPublicUrl(key) : ''),
         };
     }
 
@@ -334,7 +337,7 @@ export class StorageService implements OnModuleInit {
                 storedName: f.ten_luu_tru,
                 mimeType: f.loai_tap_tin,
                 size: f.kich_thuoc,
-                url: f.url_cong_khai || this.buildPublicUrl(f.duong_dan),
+                url: f.url_cong_khai || (f.duong_dan ? this.buildPublicUrl(f.duong_dan) : ''),
                 uploadedAt: f.ngay_tao,
             })),
             meta: {

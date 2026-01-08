@@ -1,7 +1,7 @@
 /**
  * ============================================================
- * STORAGE MODULE - MinIO/S3 Integration
- * ServiceOS - SaaS Backend - Phase 16
+ * STORAGE MODULE - DB Storage & Optional S3/MinIO
+ * ServiceOS - SaaS Backend - Phase 18
  * ============================================================
  */
 
@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { StorageController } from './controllers/storage.controller';
 import { StorageService } from './services/storage.service';
+import { DbStorageService } from './services/db-storage.service';
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { StorageService } from './services/storage.service';
         }),
     ],
     controllers: [StorageController],
-    providers: [StorageService],
-    exports: [StorageService],
+    providers: [StorageService, DbStorageService],
+    exports: [StorageService, DbStorageService],
 })
 export class StorageModule {}
